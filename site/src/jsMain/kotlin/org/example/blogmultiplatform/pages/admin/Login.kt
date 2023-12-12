@@ -63,7 +63,7 @@ import org.w3c.dom.set
 fun LoginScreen() {
     val scope = rememberCoroutineScope()
     val pageContext = rememberPageContext()
-    var errorText by remember { mutableStateOf("") }
+    var errorText by remember { mutableStateOf(" ") }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -144,20 +144,20 @@ fun LoginScreen() {
                             val password = (document.getElementById(Id.passwordInput) as HTMLInputElement).value
 
                             if (username.isNotEmpty() && password.isNotEmpty()) {
-                                val user = checkUserExistence(user = User(username, password))
+                                val user = checkUserExistence(user = User(username = username, password = password))
 
                                 if (user != null) {
                                     rememberLoggedIn(true, user)
-                                    pageContext.router.navigateTo("admin/home")
+                                    pageContext.router.navigateTo("/admin")
                                 } else {
                                     errorText = "The user doesn't exist."
                                     delay(3000)
-                                    errorText = ""
+                                    errorText = " "
                                 }
                             } else {
                                 errorText = "Input fields are empty."
                                 delay(3000)
-                                errorText = ""
+                                errorText = " "
                             }
                         }
                     }
@@ -169,6 +169,7 @@ fun LoginScreen() {
             SpanText(
                 modifier = Modifier
                     .width(350.px)
+                    .fontFamily(Constants.FONT_FAMILY)
                     .color(Colors.Red)
                     .textAlign(TextAlign.Center),
                 text = errorText
