@@ -45,6 +45,7 @@ import kotlinx.coroutines.launch
 import org.example.blogmultiplatform.models.Theme
 import org.example.blogmultiplatform.models.User
 import org.example.blogmultiplatform.models.UserWithoutPassword
+import org.example.blogmultiplatform.navigation.Screen
 import org.example.blogmultiplatform.styles.LoginInputStyle
 import org.example.blogmultiplatform.util.Constants
 import org.example.blogmultiplatform.util.Id
@@ -148,7 +149,7 @@ fun LoginScreen() {
 
                                 if (user != null) {
                                     rememberLoggedIn(true, user)
-                                    pageContext.router.navigateTo("/admin")
+                                    pageContext.router.navigateTo(Screen.AdminHome.route)
                                 } else {
                                     errorText = "The user doesn't exist."
                                     delay(3000)
