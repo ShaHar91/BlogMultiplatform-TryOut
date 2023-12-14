@@ -5,7 +5,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.FontWeight
@@ -14,7 +13,6 @@ import com.varabyte.kobweb.compose.css.TextAlign
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.Column
-import com.varabyte.kobweb.compose.http.http
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
@@ -43,25 +41,19 @@ import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
-import kotlinx.browser.localStorage
-import kotlinx.browser.window
-import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import org.example.blogmultiplatform.components.AdminPageLayout
+import org.example.blogmultiplatform.components.LoadingIndicator
 import org.example.blogmultiplatform.models.RandomJoke
 import org.example.blogmultiplatform.models.Theme
 import org.example.blogmultiplatform.navigation.Screen
 import org.example.blogmultiplatform.util.Constants
 import org.example.blogmultiplatform.util.Res
+import org.example.blogmultiplatform.util.fetchRandomJoke
 import org.example.blogmultiplatform.util.isUserLoggedIn
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.vh
-import org.w3c.dom.get
-import org.w3c.dom.set
-import kotlin.js.Date
 
 @Page
 @Composable
@@ -73,45 +65,10 @@ fun HomePage() {
 
 @Composable
 fun HomeScreen() {
-    val scope = rememberCoroutineScope()
     var randomJoke: RandomJoke? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        val date = localStorage["date"]
-        if (date != null) {
-            val difference = (Date.now() - date.toDouble())
-            val dayHasPassed = difference >= 86400000
-            if (dayHasPassed) {
-                scope.launch {
-                    try {
-                        val result = window.http.get(Constants.HUMOR_API_URL).decodeToString()
-                        randomJoke = Json.decodeFromString<RandomJoke>(result)
-                        localStorage["date"] = Date.now().toString()
-                        localStorage["joke"] = result
-                    } catch (e: Exception) {
-                        println(e.message)
-                    }
-                }
-            } else {
-                try {
-                    randomJoke = localStorage["joke"]?.let { Json.decodeFromString<RandomJoke?>(it) }
-                } catch (e: Exception) {
-                    randomJoke = RandomJoke(id = -1, joke = "Unexepected joke")
-                    println(e.message)
-                }
-            }
-        } else {
-            scope.launch {
-                try {
-                    val result = window.http.get(Constants.HUMOR_API_URL).decodeToString()
-                    randomJoke = Json.decodeFromString<RandomJoke>(result)
-                    localStorage["date"] = Date.now().toString()
-                    localStorage["joke"] = result
-                } catch (e: Exception) {
-                    println(e.message)
-                }
-            }
-        }
+        fetchRandomJoke { randomJoke = it }
     }
 
     AdminPageLayout {
@@ -185,7 +142,7 @@ fun HomeContent(randomJoke: RandomJoke?) {
                 }
             }
         } else {
-            println("Loading a joke...")
+            LoadingIndicator()
         }
     }
 }
