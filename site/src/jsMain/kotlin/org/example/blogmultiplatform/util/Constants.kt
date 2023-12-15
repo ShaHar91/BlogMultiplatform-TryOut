@@ -15,14 +15,14 @@ object Res {
     }
 
     object Icon {
-        const val bold= "/bold.svg"
-        const val italic= "/italic.svg"
-        const val link= "/link.svg"
-        const val title= "/title.svg"
-        const val subtitle= "/subtitle.svg"
-        const val quote= "/quote.svg"
-        const val code= "/code.svg"
-        const val image= "/image.svg"
+        const val bold = "/bold.svg"
+        const val italic = "/italic.svg"
+        const val link = "/link.svg"
+        const val title = "/title.svg"
+        const val subtitle = "/subtitle.svg"
+        const val quote = "/quote.svg"
+        const val code = "/code.svg"
+        const val image = "/image.svg"
     }
 
     object PathIcon {
@@ -39,4 +39,10 @@ object Id {
     const val svgParent = "svgParent"
     const val vectorIcon = "vectorIcon"
     const val navigationText = "navigationText"
+    const val editorPreview = "editorPreview"
+
+    const val titleInput = "titleInput"
+    const val subtitleInput = "subtitleInput"
+    const val thumbnailInput = "thumbnailInput"
+    const val contentInput = "contentInput"
 }

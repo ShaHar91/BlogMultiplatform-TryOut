@@ -4,6 +4,7 @@ import com.varabyte.kobweb.api.data.add
 import com.varabyte.kobweb.api.init.InitApi
 import com.varabyte.kobweb.api.init.InitApiContext
 import kotlinx.coroutines.reactive.awaitFirst
+import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.models.User
 import org.example.blogmultiplatform.utils.Constants
 import org.litote.kmongo.and
@@ -21,6 +22,11 @@ class MongoDB(private val context: InitApiContext) : MongoRepository {
     private val client = KMongo.createClient()
     private val database = client.getDatabase(Constants.DATABASE_NAME)
     private val userCollection = database.getCollection<User>()
+    private val postCollection = database.getCollection<Post>()
+
+    override suspend fun addPost(post: Post): Boolean {
+        return postCollection.insertOne(post).awaitFirst().wasAcknowledged()
+    }
 
     override suspend fun checkUserExistence(user: User): User? {
         return try {

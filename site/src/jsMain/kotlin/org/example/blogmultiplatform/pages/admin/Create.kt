@@ -4,9 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.FontWeight
+import com.varabyte.kobweb.compose.css.Overflow
+import com.varabyte.kobweb.compose.css.Resize
+import com.varabyte.kobweb.compose.css.ScrollBehavior
+import com.varabyte.kobweb.compose.css.Visibility
 import com.varabyte.kobweb.compose.file.loadDataUrlFromDisk
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -30,11 +35,16 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.height
+import com.varabyte.kobweb.compose.ui.modifiers.id
 import com.varabyte.kobweb.compose.ui.modifiers.margin
+import com.varabyte.kobweb.compose.ui.modifiers.maxHeight
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
-import com.varabyte.kobweb.compose.ui.modifiers.outline
+import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.resize
+import com.varabyte.kobweb.compose.ui.modifiers.scrollBehavior
+import com.varabyte.kobweb.compose.ui.modifiers.visibility
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
@@ -48,22 +58,46 @@ import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import kotlinx.browser.document
+import kotlinx.browser.localStorage
+import kotlinx.coroutines.launch
 import org.example.blogmultiplatform.components.AdminPageLayout
 import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.EditorKey
+import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.models.Theme
 import org.example.blogmultiplatform.styles.EditorKeyStyle
 import org.example.blogmultiplatform.util.Constants.FONT_FAMILY
 import org.example.blogmultiplatform.util.Constants.SIDE_PANEL_WIDTH
+import org.example.blogmultiplatform.util.Id
+import org.example.blogmultiplatform.util.addPost
 import org.example.blogmultiplatform.util.isUserLoggedIn
+import org.example.blogmultiplatform.util.noBorder
 import org.jetbrains.compose.web.attributes.InputType
-import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Input
 import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.dom.TextArea
 import org.jetbrains.compose.web.dom.Ul
+import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.HTMLTextAreaElement
+import kotlin.js.Date
+
+data class CreatePageUiState(
+    var id: String = "",
+    var title: String = "",
+    var subtitle: String = "",
+    var thumbnail: String = "",
+    var thumbnailInputDisabled: Boolean = true,
+    var content: String = "",
+    var category: Category = Category.Programming,
+    var popular: Boolean = false,
+    var main: Boolean = false,
+    var sponsored: Boolean = false,
+    var editorVisibility: Boolean = true
+)
 
 @Page
 @Composable
@@ -76,12 +110,8 @@ fun CreatePage() {
 @Composable
 fun CreateScreen() {
     val breakpoint = rememberBreakpoint()
-    var popularChecked by remember { mutableStateOf(false) }
-    var mainChecked by remember { mutableStateOf(false) }
-    var sponsoredChecked by remember { mutableStateOf(false) }
-    var thumbnailInputDisabled by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf(Category.Programming) }
-    var fileName by remember { mutableStateOf("") }
+    var uiState by remember { mutableStateOf(CreatePageUiState()) }
+    val scope = rememberCoroutineScope()
 
     AdminPageLayout {
         Box(
@@ -109,8 +139,8 @@ fun CreateScreen() {
                     ) {
                         Switch(
                             modifier = Modifier.margin(right = 8.px),
-                            checked = popularChecked,
-                            onCheckedChange = { popularChecked = it },
+                            checked = uiState.popular,
+                            onCheckedChange = { uiState = uiState.copy(popular = it) },
                             size = SwitchSize.LG
                         )
 
@@ -133,8 +163,8 @@ fun CreateScreen() {
                     ) {
                         Switch(
                             modifier = Modifier.margin(right = 8.px),
-                            checked = mainChecked,
-                            onCheckedChange = { mainChecked = it },
+                            checked = uiState.main,
+                            onCheckedChange = { uiState = uiState.copy(main = it) },
                             size = SwitchSize.LG
                         )
 
@@ -153,8 +183,8 @@ fun CreateScreen() {
                     ) {
                         Switch(
                             modifier = Modifier.margin(right = 8.px),
-                            checked = sponsoredChecked,
-                            onCheckedChange = { sponsoredChecked = it },
+                            checked = uiState.sponsored,
+                            onCheckedChange = { uiState = uiState.copy(sponsored = it) },
                             size = SwitchSize.LG
                         )
 
@@ -171,14 +201,14 @@ fun CreateScreen() {
                 Input(
                     type = InputType.Text,
                     attrs = Modifier
+                        .id(Id.titleInput)
                         .fillMaxWidth()
                         .height(54.px)
                         .margin(topBottom = 12.px)
                         .padding(leftRight = 20.px)
                         .backgroundColor(Theme.LightGrey.rgb)
                         .borderRadius(4.px)
-                        .border(width = 0.px, style = LineStyle.None, color = Colors.Transparent)
-                        .outline(width = 0.px, style = LineStyle.None, color = Colors.Transparent)
+                        .noBorder()
                         .fontSize(16.px)
                         .fontFamily(FONT_FAMILY)
                         .attrsModifier {
@@ -189,14 +219,14 @@ fun CreateScreen() {
                 Input(
                     type = InputType.Text,
                     attrs = Modifier
+                        .id(Id.subtitleInput)
                         .fillMaxWidth()
                         .height(54.px)
                         .margin(bottom = 12.px)
                         .padding(leftRight = 20.px)
                         .backgroundColor(Theme.LightGrey.rgb)
                         .borderRadius(4.px)
-                        .border(width = 0.px, style = LineStyle.None, color = Colors.Transparent)
-                        .outline(width = 0.px, style = LineStyle.None, color = Colors.Transparent)
+                        .noBorder()
                         .fontSize(16.px)
                         .fontFamily(FONT_FAMILY)
                         .attrsModifier {
@@ -204,8 +234,8 @@ fun CreateScreen() {
                         }.toAttrs()
                 )
 
-                CategoryDropdown(selectedCategory = selectedCategory) {
-                    selectedCategory = it
+                CategoryDropdown(selectedCategory = uiState.category) {
+                    uiState = uiState.copy(category = it)
                 }
 
                 Row(
@@ -217,8 +247,8 @@ fun CreateScreen() {
                 ) {
                     Switch(
                         modifier = Modifier.margin(right = 8.px),
-                        checked = thumbnailInputDisabled,
-                        onCheckedChange = { thumbnailInputDisabled = it },
+                        checked = !uiState.thumbnailInputDisabled,
+                        onCheckedChange = { uiState = uiState.copy(thumbnailInputDisabled = !it) },
                         size = SwitchSize.MD
                     )
 
@@ -231,13 +261,58 @@ fun CreateScreen() {
                     )
                 }
 
-                ThumbnailUploader(fileName, thumbnailInputDisabled) { filename, file ->
-                    fileName = filename
-                    println(filename)
-                    println(file)
+                ThumbnailUploader(uiState.thumbnail, uiState.thumbnailInputDisabled) { filename, file ->
+                    (document.getElementById(Id.thumbnailInput) as HTMLInputElement).value = filename
+                    uiState = uiState.copy(thumbnail = file)
                 }
 
-                EditorControls(breakpoint)
+                EditorControls(breakpoint, uiState.editorVisibility) {
+                    uiState = uiState.copy(editorVisibility = !uiState.editorVisibility)
+                }
+
+                Editor(uiState.editorVisibility)
+
+                CreateButton {
+                    uiState = uiState.copy(
+                        title = (document.getElementById(Id.titleInput) as HTMLInputElement).value,
+                        subtitle = (document.getElementById(Id.subtitleInput) as HTMLInputElement).value,
+                        content = (document.getElementById(Id.contentInput) as HTMLTextAreaElement).value,
+                    )
+
+                    if (uiState.thumbnailInputDisabled.not()) {
+                        uiState = uiState.copy(thumbnail = (document.getElementById(Id.thumbnailInput) as HTMLInputElement).value)
+                    }
+
+                    if (
+                        uiState.title.isNotEmpty() &&
+                        uiState.subtitle.isNotEmpty() &&
+                        uiState.thumbnail.isNotEmpty() &&
+                        uiState.content.isNotEmpty()
+                    ) {
+                        scope.launch {
+                            val result = addPost(
+                                Post(
+                                    author = localStorage.getItem("username").toString(),
+                                    title = uiState.title,
+                                    subtitle = uiState.subtitle,
+                                    date = Date.now().toLong(),
+                                    thumbnail = uiState.thumbnail,
+                                    content = uiState.content,
+                                    category = uiState.category,
+                                    popular = uiState.popular,
+                                    main = uiState.main,
+                                    sponsored = uiState.sponsored
+                                )
+                            )
+
+                            if (result) {
+                                println("Successful!")
+                            }
+                        }
+                    } else {
+                        println("Please fill out all fields")
+                    }
+                }
             }
         }
     }
@@ -319,16 +394,16 @@ fun ThumbnailUploader(
             .height(54.px)
     ) {
         Input(InputType.Text, attrs = Modifier
+            .id(Id.thumbnailInput)
             .fillMaxSize()
             .padding(leftRight = 20.px)
             .margin(right = 12.px)
             .backgroundColor(Theme.LightGrey.rgb)
-            .border(0.px, LineStyle.None, Colors.Transparent)
-            .outline(0.px, LineStyle.None, Colors.Transparent)
+            .noBorder()
             .fontFamily(FONT_FAMILY)
             .fontSize(16.px)
             .borderRadius(4.px)
-            .thenIf(!thumbnailInputDisabled) {
+            .thenIf(thumbnailInputDisabled) {
                 Modifier.disabled()
             }
             .toAttrs {
@@ -341,15 +416,14 @@ fun ThumbnailUploader(
             attrs = Modifier
                 .fillMaxHeight()
                 .padding(leftRight = 24.px)
-                .backgroundColor(if (thumbnailInputDisabled) Theme.Grey.rgb else Theme.Primary.rgb)
-                .color(if (thumbnailInputDisabled) Theme.DarkGrey.rgb else Theme.White.rgb)
-                .border(0.px, LineStyle.None, Colors.Transparent)
-                .outline(0.px, LineStyle.None, Colors.Transparent)
+                .backgroundColor(if (!thumbnailInputDisabled) Theme.Grey.rgb else Theme.Primary.rgb)
+                .color(if (!thumbnailInputDisabled) Theme.DarkGrey.rgb else Theme.White.rgb)
+                .noBorder()
                 .borderRadius(4.px)
                 .fontFamily(FONT_FAMILY)
                 .fontSize(14.px)
                 .fontWeight(FontWeight.Medium)
-                .thenIf(thumbnailInputDisabled) {
+                .thenIf(!thumbnailInputDisabled) {
                     Modifier.disabled()
                 }
                 .onClick {
@@ -365,7 +439,11 @@ fun ThumbnailUploader(
 }
 
 @Composable
-fun EditorControls(breakpoint: Breakpoint) {
+fun EditorControls(
+    breakpoint: Breakpoint,
+    editorVisibility: Boolean,
+    onEditorVisibilityChanged: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -398,18 +476,20 @@ fun EditorControls(breakpoint: Breakpoint) {
                         .margin(topBottom = if (breakpoint < Breakpoint.SM) 12.px else 0.px)
                         .padding(leftRight = 24.px)
                         .borderRadius(4.px)
-                        .backgroundColor(Theme.LightGrey.rgb)
-                        .color(Theme.DarkGrey.rgb)
-                        .border(0.px, LineStyle.None, Colors.Transparent)
-                        .outline(0.px, LineStyle.None, Colors.Transparent)
-                        .onClick { }
+                        .backgroundColor(if (editorVisibility) Theme.LightGrey.rgb else Theme.Primary.rgb)
+                        .color(if (editorVisibility) Theme.DarkGrey.rgb else Theme.White.rgb)
+                        .noBorder()
+                        .onClick {
+                            onEditorVisibilityChanged()
+                        }
                         .toAttrs()
                 ) {
                     SpanText(
                         modifier = Modifier
                             .fontFamily(FONT_FAMILY)
                             .fontWeight(FontWeight.Medium)
-                            .fontSize(14.px), text = "Preview"
+                            .fontSize(14.px),
+                        text = "Preview"
                     )
                 }
             }
@@ -433,6 +513,74 @@ fun EditorKeyView(key: EditorKey, onClick: () -> Unit) {
 
 }
 
+@Composable
+fun Editor(
+    editorVisibility: Boolean
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        TextArea(
+            attrs = Modifier
+                .id(Id.contentInput)
+                .fillMaxWidth()
+                .height(400.px)
+                .resize(Resize.None)
+                .maxHeight(400.px)
+                .margin(top = 8.px)
+                .padding(20.px)
+                .backgroundColor(Theme.LightGrey.rgb)
+                .fontFamily(FONT_FAMILY)
+                .fontWeight(FontWeight.Medium)
+                .fontSize(16.px)
+                .border(4.px)
+                .noBorder()
+                .visibility(if (editorVisibility) Visibility.Visible else Visibility.Hidden)
+                .toAttrs {
+                    attr("placeholder", "Type Here...")
+                }
+        )
+
+        Div(
+            attrs = Modifier
+                .id(Id.editorPreview)
+                .visibility(if (editorVisibility) Visibility.Hidden else Visibility.Visible)
+                .fillMaxWidth()
+                .height(400.px)
+                .maxHeight(400.px)
+                .margin(top = 8.px)
+                .padding(20.px)
+                .backgroundColor(Theme.LightGrey.rgb)
+                .border(4.px)
+                .noBorder()
+                .overflow(Overflow.Auto)
+                .scrollBehavior(ScrollBehavior.Smooth)
+                .toAttrs()
+        ) {
+
+        }
+    }
+}
+
+@Composable
+private fun CreateButton(onClick: () -> Unit) {
+    Button(
+        attrs = Modifier
+            .fillMaxWidth()
+            .height(54.px)
+            .margin(top = 24.px)
+            .backgroundColor(Theme.Primary.rgb)
+            .color(Theme.White.rgb)
+            .noBorder()
+            .borderRadius(4.px)
+            .fontFamily(FONT_FAMILY)
+            .fontSize(16.px)
+            .onClick { onClick() }
+            .toAttrs()
+    )
+    { SpanText("Create") }
+}
 
 
 
