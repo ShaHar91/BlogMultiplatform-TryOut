@@ -22,7 +22,6 @@ suspend fun addPost(context: ApiContext) {
             } ?: false.toString()
         )
     } catch (e: Exception) {
-        context.logger.info("API EXCEPTION: ${e.message}")
         context.res.setBodyText(Json.encodeToString(e.message))
     }
 }

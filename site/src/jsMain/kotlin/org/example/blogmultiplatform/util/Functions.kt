@@ -7,14 +7,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.outline
 import com.varabyte.kobweb.core.rememberPageContext
+import kotlinx.browser.document
 import kotlinx.browser.localStorage
+import org.example.blogmultiplatform.models.ControlStyle
 import org.example.blogmultiplatform.navigation.Screen
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.px
+import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.get
 import org.w3c.dom.set
 
@@ -49,4 +53,37 @@ fun Modifier.noBorder(): Modifier {
     return this
         .border(width = 0.px, style = LineStyle.None, color = Colors.Transparent)
         .outline(width = 0.px, style = LineStyle.None, color = Colors.Transparent)
+}
+
+fun Modifier.placeholder(text: String) : Modifier {
+    return this.attrsModifier {
+        attr("placeholder", text)
+    }
+}
+
+fun getEditor() = document.getElementById(Id.contentInput) as HTMLTextAreaElement
+
+fun getSelectedIntRange(): IntRange? {
+    val editor = getEditor()
+    val start = editor.selectionStart
+    val end = editor.selectionEnd
+
+    if (start == null || end == null) return null
+
+    return IntRange(start, (end - 1))
+}
+
+fun getSelectedText(): String? {
+    val range = getSelectedIntRange() ?: return null
+
+    return getEditor().value.substring(range)
+}
+
+fun applyStyle(controlStyle: ControlStyle) {
+    val selectedText = getSelectedText()
+    val selectedIntRange = getSelectedIntRange()
+    if (selectedIntRange != null && selectedText != null) {
+        getEditor().value = getEditor().value.replaceRange(range = selectedIntRange, replacement = controlStyle.style)
+        document.getElementById(Id.editorPreview)?.innerHTML = getEditor().value
+    }
 }

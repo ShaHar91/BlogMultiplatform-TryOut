@@ -40,6 +40,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.maxHeight
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.onKeyDown
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.resize
@@ -48,6 +49,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.visibility
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
+import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.forms.Switch
 import com.varabyte.kobweb.silk.components.forms.SwitchSize
 import com.varabyte.kobweb.silk.components.graphics.Image
@@ -59,19 +61,28 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import kotlinx.browser.document
 import kotlinx.browser.localStorage
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.example.blogmultiplatform.components.AdminPageLayout
+import org.example.blogmultiplatform.components.ControlPopup
+import org.example.blogmultiplatform.components.MessagePopup
 import org.example.blogmultiplatform.models.Category
-import org.example.blogmultiplatform.models.EditorKey
+import org.example.blogmultiplatform.models.ControlStyle
+import org.example.blogmultiplatform.models.EditorControl
 import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.models.Theme
+import org.example.blogmultiplatform.navigation.Screen
 import org.example.blogmultiplatform.styles.EditorKeyStyle
 import org.example.blogmultiplatform.util.Constants.FONT_FAMILY
 import org.example.blogmultiplatform.util.Constants.SIDE_PANEL_WIDTH
 import org.example.blogmultiplatform.util.Id
 import org.example.blogmultiplatform.util.addPost
+import org.example.blogmultiplatform.util.applyStyle
+import org.example.blogmultiplatform.util.getEditor
+import org.example.blogmultiplatform.util.getSelectedText
 import org.example.blogmultiplatform.util.isUserLoggedIn
 import org.example.blogmultiplatform.util.noBorder
+import org.example.blogmultiplatform.util.placeholder
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.A
@@ -96,7 +107,10 @@ data class CreatePageUiState(
     var popular: Boolean = false,
     var main: Boolean = false,
     var sponsored: Boolean = false,
-    var editorVisibility: Boolean = true
+    var editorVisibility: Boolean = true,
+    var messagePopup: Boolean = false,
+    var linkPopup: Boolean = false,
+    var imagePopup: Boolean = false,
 )
 
 @Page
@@ -109,6 +123,7 @@ fun CreatePage() {
 
 @Composable
 fun CreateScreen() {
+    val context = rememberPageContext()
     val breakpoint = rememberBreakpoint()
     var uiState by remember { mutableStateOf(CreatePageUiState()) }
     val scope = rememberCoroutineScope()
@@ -211,9 +226,8 @@ fun CreateScreen() {
                         .noBorder()
                         .fontSize(16.px)
                         .fontFamily(FONT_FAMILY)
-                        .attrsModifier {
-                            attr("placeholder", "Title")
-                        }.toAttrs()
+                        .placeholder("Title")
+                        .toAttrs()
                 )
 
                 Input(
@@ -229,9 +243,8 @@ fun CreateScreen() {
                         .noBorder()
                         .fontSize(16.px)
                         .fontFamily(FONT_FAMILY)
-                        .attrsModifier {
-                            attr("placeholder", "Subtitle")
-                        }.toAttrs()
+                        .placeholder("Subtitle")
+                        .toAttrs()
                 )
 
                 CategoryDropdown(selectedCategory = uiState.category) {
@@ -266,9 +279,19 @@ fun CreateScreen() {
                     uiState = uiState.copy(thumbnail = file)
                 }
 
-                EditorControls(breakpoint, uiState.editorVisibility) {
-                    uiState = uiState.copy(editorVisibility = !uiState.editorVisibility)
-                }
+                EditorControls(
+                    breakpoint = breakpoint,
+                    editorVisibility = uiState.editorVisibility,
+                    onEditorVisibilityChanged = {
+                        uiState = uiState.copy(editorVisibility = !uiState.editorVisibility)
+                    },
+                    onLinkClick = {
+                        uiState = uiState.copy(linkPopup = true)
+                    },
+                    onImageClick = {
+                        uiState = uiState.copy(imagePopup = true)
+                    }
+                )
 
                 Editor(uiState.editorVisibility)
 
@@ -306,16 +329,61 @@ fun CreateScreen() {
                             )
 
                             if (result) {
-                                println("Successful!")
+                                context.router.navigateTo(Screen.AdminSuccess.route)
                             }
                         }
                     } else {
-                        println("Please fill out all fields")
+                        scope.launch {
+                            uiState = uiState.copy(messagePopup = true)
+                            delay(2000)
+                            uiState = uiState.copy(messagePopup = false)
+                        }
                     }
                 }
             }
         }
     }
+
+    if (uiState.messagePopup) {
+        MessagePopup("Please fill out all fields") {
+            uiState = uiState.copy(messagePopup = false)
+        }
+    }
+
+    if (uiState.linkPopup) {
+        ControlPopup(
+            editControl = EditorControl.Link,
+            onDialogDismiss = {
+                uiState = uiState.copy(linkPopup = false)
+            }
+        ) { href, title ->
+            applyStyle(
+                ControlStyle.Link(
+                    selectedText = getSelectedText(),
+                    href = href,
+                    title = title
+                )
+            )
+        }
+    }
+
+    if (uiState.imagePopup) {
+        ControlPopup(
+            editControl = EditorControl.Image,
+            onDialogDismiss = {
+                uiState = uiState.copy(imagePopup = false)
+            }
+        ) { imageUrl, description ->
+            applyStyle(
+                ControlStyle.Image(
+                    selectedText = getSelectedText(),
+                    imageUrl = imageUrl,
+                    desc = description
+                )
+            )
+        }
+    }
+
 }
 
 @Composable
@@ -406,8 +474,8 @@ fun ThumbnailUploader(
             .thenIf(thumbnailInputDisabled) {
                 Modifier.disabled()
             }
+            .placeholder("Thumbnail")
             .toAttrs {
-                attr("placeholder", "Thumbnail")
                 attr("value", thumbnail)
             }
         )
@@ -442,6 +510,8 @@ fun ThumbnailUploader(
 fun EditorControls(
     breakpoint: Breakpoint,
     editorVisibility: Boolean,
+    onLinkClick: () -> Unit,
+    onImageClick: () -> Unit,
     onEditorVisibilityChanged: () -> Unit
 ) {
     Box(
@@ -458,8 +528,8 @@ fun EditorControls(
                     .borderRadius(4.px)
                     .backgroundColor(Theme.LightGrey.rgb)
             ) {
-                EditorKey.entries.forEach {
-                    EditorKeyView(it) {}
+                EditorControl.entries.forEach {
+                    EditorControlView(it) { applyControlStyle(it, onLinkClick, onImageClick) }
                 }
             }
 
@@ -481,6 +551,8 @@ fun EditorControls(
                         .noBorder()
                         .onClick {
                             onEditorVisibilityChanged()
+                            document.getElementById(Id.editorPreview)?.innerHTML = getEditor().value
+                            js("hljs.highlightAll()") as Unit
                         }
                         .toAttrs()
                 ) {
@@ -497,8 +569,30 @@ fun EditorControls(
     }
 }
 
+fun applyControlStyle(
+    editorControl: EditorControl,
+    onLinkClick: () -> Unit,
+    onImageClick: () -> Unit
+) {
+    when (editorControl) {
+        EditorControl.Bold -> applyStyle(ControlStyle.Bold(selectedText = getSelectedText()))
+        EditorControl.Italic -> applyStyle(ControlStyle.Italic(selectedText = getSelectedText()))
+        EditorControl.Link -> {
+            onLinkClick()
+        }
+
+        EditorControl.Title -> applyStyle(ControlStyle.Title(selectedText = getSelectedText()))
+        EditorControl.Subtitle -> applyStyle(ControlStyle.Subtitle(selectedText = getSelectedText()))
+        EditorControl.Quote -> applyStyle(ControlStyle.Quote(selectedText = getSelectedText()))
+        EditorControl.Code -> applyStyle(ControlStyle.Code(selectedText = getSelectedText()))
+        EditorControl.Image -> {
+            onImageClick()
+        }
+    }
+}
+
 @Composable
-fun EditorKeyView(key: EditorKey, onClick: () -> Unit) {
+fun EditorControlView(control: EditorControl, onClick: () -> Unit) {
     Box(
         modifier = EditorKeyStyle.toModifier()
             .fillMaxHeight()
@@ -508,7 +602,7 @@ fun EditorKeyView(key: EditorKey, onClick: () -> Unit) {
             .onClick { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        Image(key.icon, "${key.name} Icon")
+        Image(control.icon, "${control.name} Icon")
     }
 
 }
@@ -537,9 +631,13 @@ fun Editor(
                 .border(4.px)
                 .noBorder()
                 .visibility(if (editorVisibility) Visibility.Visible else Visibility.Hidden)
-                .toAttrs {
-                    attr("placeholder", "Type Here...")
+                .placeholder("Type Here...")
+                .onKeyDown {
+                    if (it.code == "Enter" && it.shiftKey) {
+                        applyStyle(controlStyle = ControlStyle.Break(selectedText = getSelectedText()))
+                    }
                 }
+                .toAttrs()
         )
 
         Div(

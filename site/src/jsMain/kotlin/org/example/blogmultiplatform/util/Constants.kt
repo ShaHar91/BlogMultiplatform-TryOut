@@ -23,6 +23,7 @@ object Res {
         const val quote = "/quote.svg"
         const val code = "/code.svg"
         const val image = "/image.svg"
+        const val checkmark = "/checkmark.svg"
     }
 
     object PathIcon {
@@ -45,4 +46,7 @@ object Id {
     const val subtitleInput = "subtitleInput"
     const val thumbnailInput = "thumbnailInput"
     const val contentInput = "contentInput"
+
+    const val linkHrefInput = "linkHrefInput"
+    const val linkTitleInput = "linkTitleInput"
 }

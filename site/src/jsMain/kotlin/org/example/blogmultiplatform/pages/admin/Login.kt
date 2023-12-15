@@ -50,6 +50,7 @@ import org.example.blogmultiplatform.util.Id
 import org.example.blogmultiplatform.util.Res
 import org.example.blogmultiplatform.util.checkUserExistence
 import org.example.blogmultiplatform.util.noBorder
+import org.example.blogmultiplatform.util.placeholder
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Button
@@ -94,9 +95,8 @@ fun LoginScreen() {
                     .padding(leftRight = 20.px)
                     .fontSize(14.px)
                     .backgroundColor(Colors.White)
-                    .toAttrs {
-                        attr("placeholder", "Enter username")
-                    }
+                    .placeholder("Enter username")
+                    .toAttrs()
             )
 
             Input(
@@ -110,9 +110,8 @@ fun LoginScreen() {
                     .padding(leftRight = 20.px)
                     .fontSize(14.px)
                     .backgroundColor(Colors.White)
-                    .toAttrs {
-                        attr("placeholder", "Enter password")
-                    }
+                    .placeholder("Enter password")
+                    .toAttrs()
             )
 
             Button(
