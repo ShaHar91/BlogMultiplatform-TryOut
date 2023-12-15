@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.Cursor
+import com.varabyte.kobweb.compose.css.FontWeight
+import com.varabyte.kobweb.compose.file.loadDataUrlFromDisk
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.Column
@@ -20,16 +22,20 @@ import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.cursor
+import com.varabyte.kobweb.compose.ui.modifiers.disabled
+import com.varabyte.kobweb.compose.ui.modifiers.fillMaxHeight
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxSize
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
+import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.outline
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.forms.Switch
@@ -39,6 +45,7 @@ import com.varabyte.kobweb.silk.components.layout.numColumns
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
+import kotlinx.browser.document
 import org.example.blogmultiplatform.components.AdminPageLayout
 import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.Theme
@@ -49,6 +56,7 @@ import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.A
+import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Input
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.Ul
@@ -64,10 +72,12 @@ fun CreatePage() {
 @Composable
 fun CreateScreen() {
     val breakpoint = rememberBreakpoint()
-    var popularSwitch by remember { mutableStateOf(false) }
-    var mainSwitch by remember { mutableStateOf(false) }
-    var sponsoredSwitch by remember { mutableStateOf(false) }
+    var popularChecked by remember { mutableStateOf(false) }
+    var mainChecked by remember { mutableStateOf(false) }
+    var sponsoredChecked by remember { mutableStateOf(false) }
+    var thumbnailInputDisabled by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf(Category.Programming) }
+    var fileName by remember { mutableStateOf("") }
 
     AdminPageLayout {
         Box(
@@ -95,8 +105,8 @@ fun CreateScreen() {
                     ) {
                         Switch(
                             modifier = Modifier.margin(right = 8.px),
-                            checked = popularSwitch,
-                            onCheckedChange = { popularSwitch = it },
+                            checked = popularChecked,
+                            onCheckedChange = { popularChecked = it },
                             size = SwitchSize.LG
                         )
 
@@ -119,8 +129,8 @@ fun CreateScreen() {
                     ) {
                         Switch(
                             modifier = Modifier.margin(right = 8.px),
-                            checked = mainSwitch,
-                            onCheckedChange = { mainSwitch = it },
+                            checked = mainChecked,
+                            onCheckedChange = { mainChecked = it },
                             size = SwitchSize.LG
                         )
 
@@ -139,8 +149,8 @@ fun CreateScreen() {
                     ) {
                         Switch(
                             modifier = Modifier.margin(right = 8.px),
-                            checked = sponsoredSwitch,
-                            onCheckedChange = { sponsoredSwitch = it },
+                            checked = sponsoredChecked,
+                            onCheckedChange = { sponsoredChecked = it },
                             size = SwitchSize.LG
                         )
 
@@ -192,6 +202,35 @@ fun CreateScreen() {
 
                 CategoryDropdown(selectedCategory = selectedCategory) {
                     selectedCategory = it
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .margin(topBottom = 12.px),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Switch(
+                        modifier = Modifier.margin(right = 8.px),
+                        checked = thumbnailInputDisabled,
+                        onCheckedChange = { thumbnailInputDisabled = it },
+                        size = SwitchSize.MD
+                    )
+
+                    SpanText(
+                        modifier = Modifier
+                            .fontSize(14.px)
+                            .fontFamily(FONT_FAMILY)
+                            .color(Theme.HalfBlack.rgb),
+                        text = "Paste an Image URL insead"
+                    )
+                }
+
+                ThumbnailUploader(fileName, thumbnailInputDisabled) { filename, file ->
+                    fileName = filename
+                    println(filename)
+                    println(file)
                 }
             }
         }
@@ -259,5 +298,87 @@ fun CategoryDropdown(
             }
         }
     }
-
 }
+
+@Composable
+fun ThumbnailUploader(
+    thumbnail: String,
+    thumbnailInputDisabled: Boolean,
+    onThumbnailSelect: (String, String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .margin(bottom = 20.px)
+            .height(54.px)
+    ) {
+        Input(InputType.Text, attrs = Modifier
+            .fillMaxSize()
+            .padding(leftRight = 20.px)
+            .margin(right = 12.px)
+            .backgroundColor(Theme.LightGrey.rgb)
+            .border(0.px, LineStyle.None, Colors.Transparent)
+            .outline(0.px, LineStyle.None, Colors.Transparent)
+            .fontFamily(FONT_FAMILY)
+            .fontSize(16.px)
+            .borderRadius(4.px)
+            .thenIf(!thumbnailInputDisabled) {
+                Modifier.disabled()
+            }
+            .toAttrs {
+                attr("placeholder", "Thumbnail")
+                attr("value", thumbnail)
+            }
+        )
+
+        Button(
+            attrs = Modifier
+                .fillMaxHeight()
+                .padding(leftRight = 24.px)
+                .backgroundColor(if (thumbnailInputDisabled) Theme.Grey.rgb else Theme.Primary.rgb)
+                .color(if (thumbnailInputDisabled) Theme.DarkGrey.rgb else Theme.White.rgb)
+                .border(0.px, LineStyle.None, Colors.Transparent)
+                .outline(0.px, LineStyle.None, Colors.Transparent)
+                .borderRadius(4.px)
+                .fontFamily(FONT_FAMILY)
+                .fontSize(14.px)
+                .fontWeight(FontWeight.Medium)
+                .thenIf(thumbnailInputDisabled) {
+                    Modifier.disabled()
+                }
+                .onClick {
+                    document.loadDataUrlFromDisk("image/png, image/jpeg") {
+                        onThumbnailSelect(filename, it)
+                    }
+                }
+                .toAttrs()
+        ) {
+            SpanText("Upload")
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
