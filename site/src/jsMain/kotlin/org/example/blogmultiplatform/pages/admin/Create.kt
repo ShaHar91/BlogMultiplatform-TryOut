@@ -40,15 +40,19 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.forms.Switch
 import com.varabyte.kobweb.silk.components.forms.SwitchSize
+import com.varabyte.kobweb.silk.components.graphics.Image
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
 import com.varabyte.kobweb.silk.components.layout.numColumns
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import kotlinx.browser.document
 import org.example.blogmultiplatform.components.AdminPageLayout
 import org.example.blogmultiplatform.models.Category
+import org.example.blogmultiplatform.models.EditorKey
 import org.example.blogmultiplatform.models.Theme
+import org.example.blogmultiplatform.styles.EditorKeyStyle
 import org.example.blogmultiplatform.util.Constants.FONT_FAMILY
 import org.example.blogmultiplatform.util.Constants.SIDE_PANEL_WIDTH
 import org.example.blogmultiplatform.util.isUserLoggedIn
@@ -232,6 +236,8 @@ fun CreateScreen() {
                     println(filename)
                     println(file)
                 }
+
+                EditorControls(breakpoint)
             }
         }
     }
@@ -358,7 +364,74 @@ fun ThumbnailUploader(
     }
 }
 
+@Composable
+fun EditorControls(breakpoint: Breakpoint) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        SimpleGrid(
+            modifier = Modifier.fillMaxWidth(),
+            numColumns = numColumns(1, 2)
+        ) {
+            Row(
+                modifier = Modifier
+                    .height(54.px)
+                    .borderRadius(4.px)
+                    .backgroundColor(Theme.LightGrey.rgb)
+            ) {
+                EditorKey.entries.forEach {
+                    EditorKeyView(it) {}
+                }
+            }
 
+            Box(
+                modifier = Modifier,
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Button(
+                    attrs = Modifier
+                        .height(54.px)
+                        .thenIf(breakpoint < Breakpoint.SM) {
+                            Modifier.fillMaxWidth()
+                        }
+                        .margin(topBottom = if (breakpoint < Breakpoint.SM) 12.px else 0.px)
+                        .padding(leftRight = 24.px)
+                        .borderRadius(4.px)
+                        .backgroundColor(Theme.LightGrey.rgb)
+                        .color(Theme.DarkGrey.rgb)
+                        .border(0.px, LineStyle.None, Colors.Transparent)
+                        .outline(0.px, LineStyle.None, Colors.Transparent)
+                        .onClick { }
+                        .toAttrs()
+                ) {
+                    SpanText(
+                        modifier = Modifier
+                            .fontFamily(FONT_FAMILY)
+                            .fontWeight(FontWeight.Medium)
+                            .fontSize(14.px), text = "Preview"
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EditorKeyView(key: EditorKey, onClick: () -> Unit) {
+    Box(
+        modifier = EditorKeyStyle.toModifier()
+            .fillMaxHeight()
+            .padding(leftRight = 12.px)
+            .borderRadius(4.px)
+            .cursor(Cursor.Pointer)
+            .onClick { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Image(key.icon, "${key.name} Icon")
+    }
+
+}
 
 
 
