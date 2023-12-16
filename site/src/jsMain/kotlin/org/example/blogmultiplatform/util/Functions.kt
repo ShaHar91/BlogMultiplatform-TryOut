@@ -95,3 +95,7 @@ fun Modifier.maxLines(maxLines: Int = Int.MAX_VALUE): Modifier {
         property("-webkit-box-orient", "vertical")
     }
 }
+
+fun parseSwitch(posts: List<String>): String {
+    return if(posts.size == 1) "1 Post Selected" else "${posts.size} Posts Selected"
+}

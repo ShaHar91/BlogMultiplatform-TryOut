@@ -48,6 +48,7 @@ import org.example.blogmultiplatform.util.Constants.SIDE_PANEL_WIDTH
 import org.example.blogmultiplatform.util.fetchMyPosts
 import org.example.blogmultiplatform.util.isUserLoggedIn
 import org.example.blogmultiplatform.util.noBorder
+import org.example.blogmultiplatform.util.parseSwitch
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Button
@@ -65,10 +66,11 @@ fun MyPostsScreen() {
     val breakpoint = rememberBreakpoint()
     val scope = rememberCoroutineScope()
     var selectable by remember { mutableStateOf(false) }
-    var text by remember { mutableStateOf("Select") }
+    var switchText by remember { mutableStateOf("Select") }
     val myPosts = remember { mutableStateListOf<SimplePost>() }
     var postsToSkip by remember { mutableStateOf(0) }
     var showMoreVisibility by remember { mutableStateOf(false) }
+    var selectedPosts = remember { mutableStateListOf<String>() }
 
     LaunchedEffect(Unit) {
         fetchMyPosts(
@@ -118,11 +120,19 @@ fun MyPostsScreen() {
                         modifier = Modifier.margin(right = 8.px),
                         size = SwitchSize.LG,
                         checked = selectable,
-                        onCheckedChange = { selectable = it }
+                        onCheckedChange = {
+                            selectable = it
+                            if (!selectable) {
+                                switchText = "Select"
+                                selectedPosts.clear()
+                            } else {
+                                switchText = "0 Posts selected"
+                            }
+                        }
                     )
                     SpanText(
                         modifier = Modifier.color(if (selectable) Colors.Black else Theme.HalfBlack.rgb),
-                        text = text
+                        text = switchText
                     )
                 }
 
@@ -150,6 +160,16 @@ fun MyPostsScreen() {
             Posts(
                 breakpoint = breakpoint,
                 showMoreVisibility = showMoreVisibility,
+                posts = myPosts,
+                selectable = selectable,
+                onCheckedChanged = { checked, id ->
+                    if (checked) {
+                        selectedPosts.add(id)
+                    } else {
+                        selectedPosts.remove(id)
+                    }
+                    switchText = parseSwitch(selectedPosts)
+                },
                 onShowMore = {
                     scope.launch {
                         fetchMyPosts(
@@ -168,8 +188,7 @@ fun MyPostsScreen() {
                             onError = { println(it) }
                         )
                     }
-                },
-                posts = myPosts
+                }
             )
         }
     }
