@@ -1,10 +1,6 @@
 package org.example.blogmultiplatform.pages.admin
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -33,10 +29,14 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import org.example.blogmultiplatform.components.AdminPageLayout
+import org.example.blogmultiplatform.components.Posts
 import org.example.blogmultiplatform.components.SearchBar
+import org.example.blogmultiplatform.models.ApiListResponse
+import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.models.Theme
 import org.example.blogmultiplatform.util.Constants.FONT_FAMILY
 import org.example.blogmultiplatform.util.Constants.SIDE_PANEL_WIDTH
+import org.example.blogmultiplatform.util.fetchMyPosts
 import org.example.blogmultiplatform.util.isUserLoggedIn
 import org.example.blogmultiplatform.util.noBorder
 import org.jetbrains.compose.web.css.percent
@@ -56,6 +56,15 @@ fun MyPostsScreen() {
     val breakpoint = rememberBreakpoint()
     var selectable by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("Select") }
+    val myPosts = remember { mutableStateListOf<SimplePost>() }
+
+    LaunchedEffect(Unit) {
+        fetchMyPosts(skip = 0, onSuccess = {
+            if (it is ApiListResponse.Success) {
+                myPosts.addAll(it.data)
+            }
+        }, onError = { println(it) })
+    }
 
     AdminPageLayout {
         Column(
@@ -117,6 +126,8 @@ fun MyPostsScreen() {
                     SpanText(text = "Delete")
                 }
             }
+
+            Posts(posts = myPosts)
         }
     }
 }

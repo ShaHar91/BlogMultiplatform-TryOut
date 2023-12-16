@@ -1,16 +1,12 @@
 package org.example.blogmultiplatform.util
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.outline
+import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.core.rememberPageContext
 import kotlinx.browser.document
 import kotlinx.browser.localStorage
@@ -21,6 +17,7 @@ import org.jetbrains.compose.web.css.px
 import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.get
 import org.w3c.dom.set
+import kotlin.js.Date
 
 @Composable
 fun isUserLoggedIn(content: @Composable () -> Unit) {
@@ -55,7 +52,7 @@ fun Modifier.noBorder(): Modifier {
         .outline(width = 0.px, style = LineStyle.None, color = Colors.Transparent)
 }
 
-fun Modifier.placeholder(text: String) : Modifier {
+fun Modifier.placeholder(text: String): Modifier {
     return this.attrsModifier {
         attr("placeholder", text)
     }
@@ -85,5 +82,16 @@ fun applyStyle(controlStyle: ControlStyle) {
     if (selectedIntRange != null && selectedText != null) {
         getEditor().value = getEditor().value.replaceRange(range = selectedIntRange, replacement = controlStyle.style)
         document.getElementById(Id.editorPreview)?.innerHTML = getEditor().value
+    }
+}
+
+fun Long.parseDateString() = Date(this).toLocaleDateString()
+
+fun Modifier.maxLines(maxLines: Int = Int.MAX_VALUE): Modifier {
+    return this.styleModifier {
+        property("display", "-webkit-box")
+        property("-webkit-line-clamp", maxLines)
+        property("line-clamp", maxLines)
+        property("-webkit-box-orient", "vertical")
     }
 }

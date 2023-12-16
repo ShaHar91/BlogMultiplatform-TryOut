@@ -7,6 +7,7 @@ import kotlinx.browser.window
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.models.RandomJoke
 import org.example.blogmultiplatform.models.User
@@ -88,21 +89,15 @@ suspend fun addPost(post: Post): Boolean {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+suspend fun fetchMyPosts(
+    skip: Int,
+    onSuccess: (ApiListResponse) -> Unit,
+    onError: (Exception) -> Unit
+) {
+    try {
+        val result = window.api.tryGet(apiPath = "readmyposts?skip=$skip&author=${localStorage["username"]}")?.decodeToString()
+        onSuccess(Json.decodeFromString(result.toString()))
+    } catch (e: Exception) {
+        onError(e)
+    }
+}
