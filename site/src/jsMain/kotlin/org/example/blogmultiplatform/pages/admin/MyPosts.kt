@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.FontWeight
+import com.varabyte.kobweb.compose.css.Visibility
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.visibility
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.forms.Switch
@@ -45,6 +47,7 @@ import org.example.blogmultiplatform.models.Theme
 import org.example.blogmultiplatform.util.Constants.FONT_FAMILY
 import org.example.blogmultiplatform.util.Constants.POSTS_PER_PAGE
 import org.example.blogmultiplatform.util.Constants.SIDE_PANEL_WIDTH
+import org.example.blogmultiplatform.util.deleteSelectedPosts
 import org.example.blogmultiplatform.util.fetchMyPosts
 import org.example.blogmultiplatform.util.isUserLoggedIn
 import org.example.blogmultiplatform.util.noBorder
@@ -148,8 +151,18 @@ fun MyPostsScreen() {
                         .fontFamily(FONT_FAMILY)
                         .fontSize(14.px)
                         .fontWeight(FontWeight.Medium)
+                        .visibility(if (selectedPosts.isNotEmpty()) Visibility.Visible else Visibility.Hidden)
                         .onClick {
-
+                            scope.launch {
+                                val result = deleteSelectedPosts(selectedPosts)
+                                if (result) {
+                                    selectable = false
+                                    switchText = "Select"
+                                    postsToSkip -= selectedPosts.size
+                                    myPosts.removeAll { selectedPosts.contains(it.id) }
+                                    selectedPosts.clear()
+                                }
+                            }
                         }
                         .toAttrs()
                 ) {
