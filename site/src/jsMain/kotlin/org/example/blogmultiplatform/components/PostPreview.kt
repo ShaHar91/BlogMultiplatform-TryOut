@@ -1,6 +1,7 @@
 package org.example.blogmultiplatform.components
 
 import androidx.compose.runtime.Composable
+import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.ObjectFit
 import com.varabyte.kobweb.compose.css.Overflow
@@ -9,19 +10,11 @@ import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
-import com.varabyte.kobweb.compose.ui.modifiers.color
-import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
-import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
-import com.varabyte.kobweb.compose.ui.modifiers.fontSize
-import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
-import com.varabyte.kobweb.compose.ui.modifiers.margin
-import com.varabyte.kobweb.compose.ui.modifiers.objectFit
-import com.varabyte.kobweb.compose.ui.modifiers.overflow
-import com.varabyte.kobweb.compose.ui.modifiers.textOverflow
-import com.varabyte.kobweb.compose.ui.styleModifier
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.graphics.Image
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
 import com.varabyte.kobweb.silk.components.layout.numColumns
+import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.text.SpanText
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.models.Theme
@@ -35,6 +28,9 @@ import org.jetbrains.compose.web.css.px
 fun PostPreview(post: SimplePost) {
     Column(
         modifier = Modifier
+            .fillMaxWidth(95.percent)
+            .margin(bottom = 24.px)
+            .cursor(Cursor.Pointer)
     ) {
         Image(
             modifier = Modifier
@@ -76,21 +72,17 @@ fun PostPreview(post: SimplePost) {
             text = post.subtitle
         )
 
-        SpanText(
-            modifier = Modifier
-                .fontFamily(FONT_FAMILY)
-                .fontSize(12.px)
-                .color(Theme.HalfBlack.rgb),
-            text = post.category.name
-        )
+        CategoryChip(post.category)
     }
 }
 
 @Composable
-fun Posts(posts: List<SimplePost>) {
+fun Posts(
+    breakpoint: Breakpoint,
+    posts: List<SimplePost>
+) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth(90.percent),
+        modifier = Modifier.fillMaxWidth(if (breakpoint > Breakpoint.MD) 80.percent else 90.percent),
         verticalArrangement = Arrangement.Center
     ) {
         SimpleGrid(

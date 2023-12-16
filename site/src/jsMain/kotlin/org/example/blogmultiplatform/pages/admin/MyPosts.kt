@@ -9,18 +9,7 @@ import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
-import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
-import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
-import com.varabyte.kobweb.compose.ui.modifiers.color
-import com.varabyte.kobweb.compose.ui.modifiers.fillMaxSize
-import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
-import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
-import com.varabyte.kobweb.compose.ui.modifiers.fontSize
-import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
-import com.varabyte.kobweb.compose.ui.modifiers.height
-import com.varabyte.kobweb.compose.ui.modifiers.margin
-import com.varabyte.kobweb.compose.ui.modifiers.onClick
-import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.forms.Switch
@@ -86,9 +75,9 @@ fun MyPostsScreen() {
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(90.percent)
+                    .fillMaxWidth(if (breakpoint > Breakpoint.MD) 80.percent else 90.percent)
                     .margin(bottom = 24.px),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(
@@ -109,6 +98,7 @@ fun MyPostsScreen() {
 
                 Button(
                     attrs = Modifier
+                        .margin(right = 20.px)
                         .height(54.px)
                         .padding(leftRight = 24.px)
                         .backgroundColor(Theme.Red.rgb)
@@ -127,7 +117,7 @@ fun MyPostsScreen() {
                 }
             }
 
-            Posts(posts = myPosts)
+            Posts(breakpoint = breakpoint, posts = myPosts)
         }
     }
 }
