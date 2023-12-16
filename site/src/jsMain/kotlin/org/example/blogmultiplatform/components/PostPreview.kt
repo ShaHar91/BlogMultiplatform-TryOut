@@ -6,8 +6,10 @@ import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.ObjectFit
 import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.css.TextOverflow
+import com.varabyte.kobweb.compose.css.Visibility
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Column
+import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
@@ -79,11 +81,14 @@ fun PostPreview(post: SimplePost) {
 @Composable
 fun Posts(
     breakpoint: Breakpoint,
+    showMoreVisibility: Boolean,
+    onShowMore: () -> Unit,
     posts: List<SimplePost>
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(if (breakpoint > Breakpoint.MD) 80.percent else 90.percent),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         SimpleGrid(
             modifier = Modifier.fillMaxWidth(),
@@ -93,5 +98,16 @@ fun Posts(
                 PostPreview(it)
             }
         }
+
+        SpanText(
+            modifier = Modifier
+                .margin(topBottom = 50.px)
+                .fontFamily(FONT_FAMILY)
+                .fontSize(16.px)
+                .fontWeight(FontWeight.Medium)
+                .cursor(Cursor.Pointer)
+                .visibility(if (showMoreVisibility) Visibility.Visible else Visibility.Hidden)
+                .onClick { onShowMore()  },
+            text ="Show more")
     }
 }

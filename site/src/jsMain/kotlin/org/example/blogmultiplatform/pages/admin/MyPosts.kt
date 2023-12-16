@@ -1,6 +1,13 @@
 package org.example.blogmultiplatform.pages.admin
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -9,7 +16,18 @@ import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
-import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
+import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
+import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.modifiers.fillMaxSize
+import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
+import com.varabyte.kobweb.compose.ui.modifiers.fontSize
+import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
+import com.varabyte.kobweb.compose.ui.modifiers.height
+import com.varabyte.kobweb.compose.ui.modifiers.margin
+import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.forms.Switch
@@ -17,6 +35,7 @@ import com.varabyte.kobweb.silk.components.forms.SwitchSize
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
+import kotlinx.coroutines.launch
 import org.example.blogmultiplatform.components.AdminPageLayout
 import org.example.blogmultiplatform.components.Posts
 import org.example.blogmultiplatform.components.SearchBar
@@ -24,6 +43,7 @@ import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.models.Theme
 import org.example.blogmultiplatform.util.Constants.FONT_FAMILY
+import org.example.blogmultiplatform.util.Constants.POSTS_PER_PAGE
 import org.example.blogmultiplatform.util.Constants.SIDE_PANEL_WIDTH
 import org.example.blogmultiplatform.util.fetchMyPosts
 import org.example.blogmultiplatform.util.isUserLoggedIn
@@ -43,16 +63,26 @@ fun MyPostsPage() {
 @Composable
 fun MyPostsScreen() {
     val breakpoint = rememberBreakpoint()
+    val scope = rememberCoroutineScope()
     var selectable by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("Select") }
     val myPosts = remember { mutableStateListOf<SimplePost>() }
+    var postsToSkip by remember { mutableStateOf(0) }
+    var showMoreVisibility by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        fetchMyPosts(skip = 0, onSuccess = {
-            if (it is ApiListResponse.Success) {
-                myPosts.addAll(it.data)
-            }
-        }, onError = { println(it) })
+        fetchMyPosts(
+            skip = postsToSkip,
+            onSuccess = {
+                if (it is ApiListResponse.Success) {
+                    myPosts.clear()
+                    myPosts.addAll(it.data)
+                    postsToSkip += it.data.count()
+                    showMoreVisibility = it.data.size >= POSTS_PER_PAGE
+                }
+            },
+            onError = { println(it) }
+        )
     }
 
     AdminPageLayout {
@@ -117,7 +147,30 @@ fun MyPostsScreen() {
                 }
             }
 
-            Posts(breakpoint = breakpoint, posts = myPosts)
+            Posts(
+                breakpoint = breakpoint,
+                showMoreVisibility = showMoreVisibility,
+                onShowMore = {
+                    scope.launch {
+                        fetchMyPosts(
+                            skip = postsToSkip,
+                            onSuccess = {
+                                if (it is ApiListResponse.Success) {
+                                    if (it.data.isNotEmpty()) {
+                                        myPosts.addAll(it.data)
+                                        postsToSkip += it.data.count()
+                                        if (it.data.size < POSTS_PER_PAGE) showMoreVisibility = false
+                                    } else {
+                                        showMoreVisibility = false
+                                    }
+                                }
+                            },
+                            onError = { println(it) }
+                        )
+                    }
+                },
+                posts = myPosts
+            )
         }
     }
 }
