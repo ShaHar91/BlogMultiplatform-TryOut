@@ -4,6 +4,7 @@ import com.varabyte.kobweb.browser.api
 import com.varabyte.kobweb.compose.http.http
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.example.blogmultiplatform.models.ApiListResponse
@@ -112,5 +113,17 @@ suspend fun deleteSelectedPosts(ids: List<String>): Boolean {
     } catch (e: Exception) {
         println(e.message)
         false
+    }
+}
+
+suspend fun searchPostsByTitle(query: String, skip: Int, onSuccess: (ApiListResponse) -> Unit, onError: (Exception) -> Unit) {
+    try {
+        val result = window.api.tryGet(
+            apiPath = "searchposts?query=$query&skip=$skip",
+        )?.decodeToString()
+
+        onSuccess(Json.decodeFromString(result.toString()))
+    } catch(e: Exception) {
+        onError(e)
     }
 }

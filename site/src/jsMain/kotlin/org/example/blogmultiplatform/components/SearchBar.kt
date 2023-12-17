@@ -17,6 +17,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.height
+import com.varabyte.kobweb.compose.ui.modifiers.id
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.onFocusIn
 import com.varabyte.kobweb.compose.ui.modifiers.onFocusOut
@@ -27,6 +28,7 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaMagnifyingGlass
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import org.example.blogmultiplatform.models.Theme
+import org.example.blogmultiplatform.util.Id
 import org.example.blogmultiplatform.util.noBorder
 import org.example.blogmultiplatform.util.placeholder
 import org.jetbrains.compose.web.attributes.InputType
@@ -60,6 +62,7 @@ fun SearchBar(onEnterClick: () -> Unit) {
         Input(
             type = InputType.Text,
             attrs = Modifier
+                .id(Id.adminSearchBar)
                 .fillMaxWidth()
                 .color(Colors.Black)
                 .backgroundColor(Colors.Transparent)

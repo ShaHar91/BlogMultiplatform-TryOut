@@ -32,11 +32,13 @@ import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.visibility
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
+import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.forms.Switch
 import com.varabyte.kobweb.silk.components.forms.SwitchSize
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
+import kotlinx.browser.document
 import kotlinx.coroutines.launch
 import org.example.blogmultiplatform.components.AdminPageLayout
 import org.example.blogmultiplatform.components.Posts
@@ -44,17 +46,22 @@ import org.example.blogmultiplatform.components.SearchBar
 import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.models.Theme
+import org.example.blogmultiplatform.navigation.Screen
 import org.example.blogmultiplatform.util.Constants.FONT_FAMILY
 import org.example.blogmultiplatform.util.Constants.POSTS_PER_PAGE
+import org.example.blogmultiplatform.util.Constants.QUERY_PARAM
 import org.example.blogmultiplatform.util.Constants.SIDE_PANEL_WIDTH
+import org.example.blogmultiplatform.util.Id
 import org.example.blogmultiplatform.util.deleteSelectedPosts
 import org.example.blogmultiplatform.util.fetchMyPosts
 import org.example.blogmultiplatform.util.isUserLoggedIn
 import org.example.blogmultiplatform.util.noBorder
 import org.example.blogmultiplatform.util.parseSwitch
+import org.example.blogmultiplatform.util.searchPostsByTitle
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Button
+import org.w3c.dom.HTMLInputElement
 
 @Page
 @Composable
@@ -66,6 +73,7 @@ fun MyPostsPage() {
 
 @Composable
 fun MyPostsScreen() {
+    val context = rememberPageContext()
     val breakpoint = rememberBreakpoint()
     val scope = rememberCoroutineScope()
     var selectable by remember { mutableStateOf(false) }
@@ -75,19 +83,46 @@ fun MyPostsScreen() {
     var showMoreVisibility by remember { mutableStateOf(false) }
     var selectedPosts = remember { mutableStateListOf<String>() }
 
-    LaunchedEffect(Unit) {
-        fetchMyPosts(
-            skip = postsToSkip,
-            onSuccess = {
-                if (it is ApiListResponse.Success) {
-                    myPosts.clear()
-                    myPosts.addAll(it.data)
-                    postsToSkip += it.data.count()
-                    showMoreVisibility = it.data.size >= POSTS_PER_PAGE
-                }
-            },
-            onError = { println(it) }
-        )
+    val hasParams = remember(context.route) { context.route.params.containsKey(QUERY_PARAM) }
+    var query = remember(context.route) {
+        try {
+            context.route.params.getValue(QUERY_PARAM)
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    LaunchedEffect(context.route) {
+        postsToSkip = 0
+        
+        if (hasParams) {
+            searchPostsByTitle(
+                query,
+                postsToSkip,
+                onSuccess = {
+                    if (it is ApiListResponse.Success) {
+                        myPosts.clear()
+                        myPosts.addAll(it.data)
+                        postsToSkip += it.data.count()
+                        showMoreVisibility = it.data.size >= POSTS_PER_PAGE
+                    }
+                },
+                onError = { println(it) }
+            )
+        } else {
+            fetchMyPosts(
+                skip = postsToSkip,
+                onSuccess = {
+                    if (it is ApiListResponse.Success) {
+                        myPosts.clear()
+                        myPosts.addAll(it.data)
+                        postsToSkip += it.data.count()
+                        showMoreVisibility = it.data.size >= POSTS_PER_PAGE
+                    }
+                },
+                onError = { println(it) }
+            )
+        }
     }
 
     AdminPageLayout {
@@ -105,7 +140,14 @@ fun MyPostsScreen() {
                     .margin(bottom = 24.px),
                 contentAlignment = Alignment.Center
             ) {
-                SearchBar { }
+                SearchBar {
+                    val query = (document.getElementById(Id.adminSearchBar) as HTMLInputElement).value
+                    if (query.isNotEmpty()) {
+                        context.router.navigateTo(Screen.AdminMyPosts.searchByTitle(query))
+                    } else {
+                        context.router.navigateTo(Screen.AdminMyPosts.route)
+                    }
+                }
             }
 
             Row(
@@ -185,21 +227,40 @@ fun MyPostsScreen() {
                 },
                 onShowMore = {
                     scope.launch {
-                        fetchMyPosts(
-                            skip = postsToSkip,
-                            onSuccess = {
-                                if (it is ApiListResponse.Success) {
-                                    if (it.data.isNotEmpty()) {
-                                        myPosts.addAll(it.data)
-                                        postsToSkip += it.data.count()
-                                        if (it.data.size < POSTS_PER_PAGE) showMoreVisibility = false
-                                    } else {
-                                        showMoreVisibility = false
+                        if (hasParams) {
+                            searchPostsByTitle(
+                                query,
+                                postsToSkip,
+                                onSuccess = {
+                                    if (it is ApiListResponse.Success) {
+                                        if (it.data.isNotEmpty()) {
+                                            myPosts.addAll(it.data)
+                                            postsToSkip += it.data.count()
+                                            if (it.data.size < POSTS_PER_PAGE) showMoreVisibility = false
+                                        } else {
+                                            showMoreVisibility = false
+                                        }
                                     }
-                                }
-                            },
-                            onError = { println(it) }
-                        )
+                                },
+                                onError = { println(it) }
+                            )
+                        } else {
+                            fetchMyPosts(
+                                skip = postsToSkip,
+                                onSuccess = {
+                                    if (it is ApiListResponse.Success) {
+                                        if (it.data.isNotEmpty()) {
+                                            myPosts.addAll(it.data)
+                                            postsToSkip += it.data.count()
+                                            if (it.data.size < POSTS_PER_PAGE) showMoreVisibility = false
+                                        } else {
+                                            showMoreVisibility = false
+                                        }
+                                    }
+                                },
+                                onError = { println(it) }
+                            )
+                        }
                     }
                 }
             )

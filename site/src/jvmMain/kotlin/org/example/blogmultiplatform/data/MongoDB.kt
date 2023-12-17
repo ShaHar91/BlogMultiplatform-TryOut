@@ -17,6 +17,7 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.`in`
 import org.litote.kmongo.reactivestreams.KMongo
 import org.litote.kmongo.reactivestreams.getCollection
+import org.litote.kmongo.regex
 
 @InitApi
 fun initMongoDB(context: InitApiContext) {
@@ -37,6 +38,16 @@ class MongoDB(private val context: InitApiContext) : MongoRepository {
     override suspend fun readMyPosts(skip: Int, author: String): List<SimplePost> {
         return postCollection.withDocumentClass(SimplePost::class.java)
             .find(SimplePost::author eq author)
+            .sort(descending(SimplePost::date))
+            .skip(skip)
+            .limit(POSTS_PER_PAGE)
+            .toList()
+    }
+
+    override suspend fun searchPostsByTitle(query: String, skip: Int): List<SimplePost> {
+        val regexQuery = query.toRegex(RegexOption.IGNORE_CASE)
+        return postCollection.withDocumentClass(SimplePost::class.java)
+            .find(SimplePost::title regex regexQuery)
             .sort(descending(SimplePost::date))
             .skip(skip)
             .limit(POSTS_PER_PAGE)
