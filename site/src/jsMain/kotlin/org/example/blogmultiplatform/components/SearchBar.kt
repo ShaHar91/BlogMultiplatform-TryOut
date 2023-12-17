@@ -29,9 +29,9 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaMagnifyingGlass
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import org.example.blogmultiplatform.models.Theme
-import org.example.blogmultiplatform.util.Id
-import org.example.blogmultiplatform.util.noBorder
-import org.example.blogmultiplatform.util.placeholder
+import org.example.blogmultiplatform.utils.Id
+import org.example.blogmultiplatform.utils.noBorder
+import org.example.blogmultiplatform.utils.placeholder
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.ms

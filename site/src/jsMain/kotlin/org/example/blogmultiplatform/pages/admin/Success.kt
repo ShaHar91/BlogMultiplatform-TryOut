@@ -17,8 +17,8 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import kotlinx.browser.window
 import kotlinx.coroutines.delay
 import org.example.blogmultiplatform.models.Theme
-import org.example.blogmultiplatform.util.Constants.FONT_FAMILY
-import org.example.blogmultiplatform.util.Res
+import org.example.blogmultiplatform.utils.Constants.FONT_FAMILY
+import org.example.blogmultiplatform.utils.Res
 import org.jetbrains.compose.web.css.px
 
 @Page

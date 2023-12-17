@@ -17,33 +17,33 @@ import java.security.MessageDigest
 suspend fun userCheck(context: ApiContext) {
     try {
         // Get the data from the request and parse it to User object
-        val userRequest = context.req.body?.decodeToString()?.let { Json.decodeFromString<User>(it) }
+        val userRequest = context.req.getBody<User>()
         // If the data in the request is a User object, check if the user exists in the MongoDB database
         val user = userRequest?.let { context.data.getValue<MongoDB>().checkUserExistence(User(username = it.username, password = hashPassword(it.password))) }
 
         if (user != null) {
-            context.res.setBodyText(Json.encodeToString<UserWithoutPassword>(UserWithoutPassword(id = user.id, username = user.username)))
+            context.res.setBody<UserWithoutPassword>(UserWithoutPassword(id = user.id, username = user.username))
         } else {
-            context.res.setBodyText(Json.encodeToString(Exception("User doesn't exist")))
+            context.res.setBody(Exception("User doesn't exist"))
         }
     } catch (e: Exception) {
-        context.res.setBodyText(Json.encodeToString(e))
+        context.res.setBody(e)
     }
 }
 
 @Api("checkuserid")
 suspend fun checkUserId(context: ApiContext) {
     try {
-        val idRequest = context.req.body?.decodeToString()?.let { Json.decodeFromString<String>(it) }
+        val idRequest = context.req.getBody<String>()
         val result = idRequest?.let { context.data.getValue<MongoDB>().checkUserId(it) }
 
         if (result != null) {
-            context.res.setBodyText(Json.encodeToString(result))
+            context.res.setBody(result)
         } else {
-            context.res.setBodyText(Json.encodeToString(false))
+            context.res.setBody(false)
         }
     } catch (e: Exception) {
-        context.res.setBodyText(Json.encodeToString(false))
+        context.res.setBody(false)
     }
 }
 

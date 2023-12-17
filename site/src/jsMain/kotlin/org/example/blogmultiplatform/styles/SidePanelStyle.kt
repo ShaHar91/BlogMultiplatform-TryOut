@@ -8,7 +8,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import org.example.blogmultiplatform.models.Theme
-import org.example.blogmultiplatform.util.Id
+import org.example.blogmultiplatform.utils.Id
 import org.jetbrains.compose.web.css.ms
 
 val NavigationItemStyle by ComponentStyle {

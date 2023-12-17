@@ -1,4 +1,4 @@
-package org.example.blogmultiplatform.util
+package org.example.blogmultiplatform.utils
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier

@@ -46,10 +46,10 @@ import org.example.blogmultiplatform.components.LoadingIndicator
 import org.example.blogmultiplatform.models.RandomJoke
 import org.example.blogmultiplatform.models.Theme
 import org.example.blogmultiplatform.navigation.Screen
-import org.example.blogmultiplatform.util.Constants
-import org.example.blogmultiplatform.util.Res
-import org.example.blogmultiplatform.util.fetchRandomJoke
-import org.example.blogmultiplatform.util.isUserLoggedIn
+import org.example.blogmultiplatform.utils.Constants
+import org.example.blogmultiplatform.utils.Res
+import org.example.blogmultiplatform.utils.fetchRandomJoke
+import org.example.blogmultiplatform.utils.isUserLoggedIn
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px

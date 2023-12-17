@@ -1,6 +1,6 @@
 package org.example.blogmultiplatform.models
 
-import org.example.blogmultiplatform.util.Res
+import org.example.blogmultiplatform.utils.Res
 
 enum class EditorControl(
     val icon: String

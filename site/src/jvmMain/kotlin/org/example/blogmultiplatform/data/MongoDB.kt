@@ -8,8 +8,8 @@ import kotlinx.coroutines.reactive.awaitLast
 import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.models.User
-import org.example.blogmultiplatform.utils.Constants
-import org.example.blogmultiplatform.utils.Constants.POSTS_PER_PAGE
+import org.example.blogmultiplatform.utils.CommonConstants.POSTS_PER_PAGE
+import org.example.blogmultiplatform.utils.Constants.DATABASE_NAME
 import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.toList
 import org.litote.kmongo.descending
@@ -27,7 +27,7 @@ fun initMongoDB(context: InitApiContext) {
 
 class MongoDB(private val context: InitApiContext) : MongoRepository {
     private val client = KMongo.createClient()
-    private val database = client.getDatabase(Constants.DATABASE_NAME)
+    private val database = client.getDatabase(DATABASE_NAME)
     private val userCollection = database.getCollection<User>()
     private val postCollection = database.getCollection<Post>()
 
@@ -52,6 +52,10 @@ class MongoDB(private val context: InitApiContext) : MongoRepository {
             .skip(skip)
             .limit(POSTS_PER_PAGE)
             .toList()
+    }
+
+    override suspend fun readSelectedPost(id: String): Post {
+        return postCollection.find(Post::id eq id).toList().first()
     }
 
     override suspend fun deleteSelectedPosts(ids: List<String>): Boolean {

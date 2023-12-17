@@ -30,11 +30,11 @@ import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import kotlinx.browser.document
 import org.example.blogmultiplatform.models.EditorControl
 import org.example.blogmultiplatform.models.Theme
-import org.example.blogmultiplatform.util.Constants
-import org.example.blogmultiplatform.util.Constants.FONT_FAMILY
-import org.example.blogmultiplatform.util.Id
-import org.example.blogmultiplatform.util.noBorder
-import org.example.blogmultiplatform.util.placeholder
+import org.example.blogmultiplatform.utils.Constants
+import org.example.blogmultiplatform.utils.Constants.FONT_FAMILY
+import org.example.blogmultiplatform.utils.Id
+import org.example.blogmultiplatform.utils.noBorder
+import org.example.blogmultiplatform.utils.placeholder
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.px

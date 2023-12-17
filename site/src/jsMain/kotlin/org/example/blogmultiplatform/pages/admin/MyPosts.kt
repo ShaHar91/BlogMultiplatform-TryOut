@@ -50,17 +50,17 @@ import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.models.Theme
 import org.example.blogmultiplatform.navigation.Screen
-import org.example.blogmultiplatform.util.Constants.FONT_FAMILY
-import org.example.blogmultiplatform.util.Constants.POSTS_PER_PAGE
-import org.example.blogmultiplatform.util.Constants.QUERY_PARAM
-import org.example.blogmultiplatform.util.Constants.SIDE_PANEL_WIDTH
-import org.example.blogmultiplatform.util.Id
-import org.example.blogmultiplatform.util.deleteSelectedPosts
-import org.example.blogmultiplatform.util.fetchMyPosts
-import org.example.blogmultiplatform.util.isUserLoggedIn
-import org.example.blogmultiplatform.util.noBorder
-import org.example.blogmultiplatform.util.parseSwitch
-import org.example.blogmultiplatform.util.searchPostsByTitle
+import org.example.blogmultiplatform.utils.CommonConstants.POSTS_PER_PAGE
+import org.example.blogmultiplatform.utils.CommonConstants.QUERY_PARAM
+import org.example.blogmultiplatform.utils.Constants.FONT_FAMILY
+import org.example.blogmultiplatform.utils.Constants.SIDE_PANEL_WIDTH
+import org.example.blogmultiplatform.utils.Id
+import org.example.blogmultiplatform.utils.deleteSelectedPosts
+import org.example.blogmultiplatform.utils.fetchMyPosts
+import org.example.blogmultiplatform.utils.isUserLoggedIn
+import org.example.blogmultiplatform.utils.noBorder
+import org.example.blogmultiplatform.utils.parseSwitch
+import org.example.blogmultiplatform.utils.searchPostsByTitle
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
@@ -80,7 +80,7 @@ fun MyPostsScreen() {
     val context = rememberPageContext()
     val breakpoint = rememberBreakpoint()
     val scope = rememberCoroutineScope()
-    var selectable by remember { mutableStateOf(false) }
+    var selectableMode by remember { mutableStateOf(false) }
     var switchText by remember { mutableStateOf("Select") }
     val myPosts = remember { mutableStateListOf<SimplePost>() }
     var postsToSkip by remember { mutableStateOf(0) }
@@ -88,13 +88,7 @@ fun MyPostsScreen() {
     val selectedPosts = remember { mutableStateListOf<String>() }
 
     val hasParams = remember(context.route) { context.route.params.containsKey(QUERY_PARAM) }
-    val query = remember(context.route) {
-        try {
-            context.route.params.getValue(QUERY_PARAM)
-        } catch (e: Exception) {
-            ""
-        }
-    }
+    val query = remember(context.route) { context.route.params[QUERY_PARAM] ?: "" }
 
     LaunchedEffect(context.route) {
         postsToSkip = 0
@@ -148,7 +142,7 @@ fun MyPostsScreen() {
             ) {
                 SearchBar(
                     Modifier
-                        .visibility(if (selectable) Visibility.Hidden else Visibility.Visible)
+                        .visibility(if (selectableMode) Visibility.Hidden else Visibility.Visible)
                         .transition(CSSTransition(TransitionProperty.All, 300.ms))
                 ) {
                     val query = (document.getElementById(Id.adminSearchBar) as HTMLInputElement).value
@@ -174,10 +168,10 @@ fun MyPostsScreen() {
                     Switch(
                         modifier = Modifier.margin(right = 8.px),
                         size = SwitchSize.LG,
-                        checked = selectable,
+                        checked = selectableMode,
                         onCheckedChange = {
-                            selectable = it
-                            if (!selectable) {
+                            selectableMode = it
+                            if (!selectableMode) {
                                 switchText = "Select"
                                 selectedPosts.clear()
                             } else {
@@ -186,7 +180,7 @@ fun MyPostsScreen() {
                         }
                     )
                     SpanText(
-                        modifier = Modifier.color(if (selectable) Colors.Black else Theme.HalfBlack.rgb),
+                        modifier = Modifier.color(if (selectableMode) Colors.Black else Theme.HalfBlack.rgb),
                         text = switchText
                     )
                 }
@@ -208,7 +202,7 @@ fun MyPostsScreen() {
                             scope.launch {
                                 val result = deleteSelectedPosts(selectedPosts)
                                 if (result) {
-                                    selectable = false
+                                    selectableMode = false
                                     switchText = "Select"
                                     postsToSkip -= selectedPosts.size
                                     myPosts.removeAll { selectedPosts.contains(it.id) }
@@ -226,7 +220,7 @@ fun MyPostsScreen() {
                 breakpoint = breakpoint,
                 showMoreVisibility = showMoreVisibility,
                 posts = myPosts,
-                selectable = selectable,
+                selectableMode = selectableMode,
                 onCheckedChanged = { checked, id ->
                     if (checked) {
                         selectedPosts.add(id)
