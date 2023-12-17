@@ -8,7 +8,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.css.FontWeight
+import com.varabyte.kobweb.compose.css.TransitionProperty
 import com.varabyte.kobweb.compose.css.Visibility
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -29,6 +31,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.visibility
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
@@ -58,6 +61,7 @@ import org.example.blogmultiplatform.util.isUserLoggedIn
 import org.example.blogmultiplatform.util.noBorder
 import org.example.blogmultiplatform.util.parseSwitch
 import org.example.blogmultiplatform.util.searchPostsByTitle
+import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Button
@@ -81,10 +85,10 @@ fun MyPostsScreen() {
     val myPosts = remember { mutableStateListOf<SimplePost>() }
     var postsToSkip by remember { mutableStateOf(0) }
     var showMoreVisibility by remember { mutableStateOf(false) }
-    var selectedPosts = remember { mutableStateListOf<String>() }
+    val selectedPosts = remember { mutableStateListOf<String>() }
 
     val hasParams = remember(context.route) { context.route.params.containsKey(QUERY_PARAM) }
-    var query = remember(context.route) {
+    val query = remember(context.route) {
         try {
             context.route.params.getValue(QUERY_PARAM)
         } catch (e: Exception) {
@@ -94,8 +98,10 @@ fun MyPostsScreen() {
 
     LaunchedEffect(context.route) {
         postsToSkip = 0
-        
+
         if (hasParams) {
+            (document.getElementById(Id.adminSearchBar) as HTMLInputElement).value = query.replace("%20", " ")
+
             searchPostsByTitle(
                 query,
                 postsToSkip,
@@ -140,7 +146,11 @@ fun MyPostsScreen() {
                     .margin(bottom = 24.px),
                 contentAlignment = Alignment.Center
             ) {
-                SearchBar {
+                SearchBar(
+                    Modifier
+                        .visibility(if (selectable) Visibility.Hidden else Visibility.Visible)
+                        .transition(CSSTransition(TransitionProperty.All, 300.ms))
+                ) {
                     val query = (document.getElementById(Id.adminSearchBar) as HTMLInputElement).value
                     if (query.isNotEmpty()) {
                         context.router.navigateTo(Screen.AdminMyPosts.searchByTitle(query))
