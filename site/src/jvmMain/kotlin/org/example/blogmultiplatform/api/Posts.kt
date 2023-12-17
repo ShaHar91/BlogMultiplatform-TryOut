@@ -34,6 +34,17 @@ suspend fun addPost(context: ApiContext) {
     }
 }
 
+@Api("updatepost")
+suspend fun updatePost(context: ApiContext) {
+    try {
+        val updatedPost = context.req.getBody<Post>()
+        context.logger.error(updatedPost.toString())
+        context.res.setBody(updatedPost?.let { context.data.getValue<MongoDB>().updatePost(it) })
+    } catch(e: Exception) {
+        context.res.setBody(e.message)
+    }
+}
+
 @Api("readmyposts")
 suspend fun readMyPosts(context: ApiContext) {
     try {

@@ -12,6 +12,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.core.Page
+import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.graphics.Image
 import com.varabyte.kobweb.silk.components.text.SpanText
 import kotlinx.browser.window
@@ -24,6 +25,9 @@ import org.jetbrains.compose.web.css.px
 @Page
 @Composable
 fun SuccessPage() {
+    val context = rememberPageContext()
+    val postUpdated = context.route.params.containsKey("updated")
+
     LaunchedEffect(Unit) {
         delay(3000)
         window.history.back()
@@ -46,7 +50,7 @@ fun SuccessPage() {
             modifier = Modifier
                 .fontFamily(FONT_FAMILY)
                 .fontSize(24.px),
-            text = "Post Successfully Created!"
+            text = if (postUpdated) "Post Successfully Updated!" else "Post Successfully Created!"
         )
 
         SpanText(
