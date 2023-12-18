@@ -12,7 +12,6 @@ import com.varabyte.kobweb.compose.css.ObjectFit
 import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.css.TextOverflow
 import com.varabyte.kobweb.compose.css.TransitionProperty
-import com.varabyte.kobweb.compose.css.Visibility
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.foundation.layout.Row
@@ -36,14 +35,10 @@ import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.size
 import com.varabyte.kobweb.compose.ui.modifiers.textOverflow
 import com.varabyte.kobweb.compose.ui.modifiers.transition
-import com.varabyte.kobweb.compose.ui.modifiers.visibility
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.graphics.Image
-import com.varabyte.kobweb.silk.components.layout.SimpleGrid
-import com.varabyte.kobweb.silk.components.layout.numColumns
-import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.text.SpanText
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.models.Theme
@@ -68,10 +63,11 @@ fun PostPreview(
     selectableMode: Boolean = false,
     thumbnailHeight: CSSSizeValue<CSSUnit.px> = 320.px,
     titleMaxLength: Int = 2,
-    onCheckedChanged: (Boolean, String) -> Unit = { _, _ -> }
+    onCheckedChanged: (Boolean, String) -> Unit = { _, _ -> },
+    onClick: (String) -> Unit
 ) {
-    val context = rememberPageContext()
     var checked by remember(selectableMode) { mutableStateOf(false) }
+
     if (vertical) {
         Column(
             modifier = modifier
@@ -89,7 +85,7 @@ fun PostPreview(
                         checked = !checked
                         onCheckedChanged(checked, post.id)
                     } else {
-                        context.router.navigateTo(Screen.AdminCreate.passPostId(post.id))
+                        onClick(post.id)
                     }
                 }
                 .transition(CSSTransition(TransitionProperty.All, 300.ms))
@@ -135,7 +131,7 @@ fun PostContent(
 ) {
     Image(
         modifier = Modifier
-            .margin(bottom = 16.px)
+            .margin(bottom = if (darkTheme) 20.px else 16.px)
             .height(thumbnailHeight)
             .fillMaxWidth(if (vertical) 100.percent else 40.percent)
             .objectFit(ObjectFit.Cover),
@@ -198,46 +194,5 @@ fun PostContent(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun Posts(
-    breakpoint: Breakpoint,
-    posts: List<SimplePost>,
-    selectableMode: Boolean = false,
-    onCheckedChanged: (Boolean, String) -> Unit,
-    showMoreVisibility: Boolean,
-    onShowMore: () -> Unit,
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(if (breakpoint > Breakpoint.MD) 80.percent else 90.percent),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        SimpleGrid(
-            modifier = Modifier.fillMaxWidth(),
-            numColumns = numColumns(1, 2, 3, 4)
-        ) {
-            posts.forEach {
-                PostPreview(
-                    post = it,
-                    selectableMode = selectableMode,
-                    onCheckedChanged = onCheckedChanged
-                )
-            }
-        }
-
-        SpanText(
-            modifier = Modifier
-                .margin(topBottom = 50.px)
-                .fontFamily(FONT_FAMILY)
-                .fontSize(16.px)
-                .fontWeight(FontWeight.Medium)
-                .cursor(Cursor.Pointer)
-                .visibility(if (showMoreVisibility) Visibility.Visible else Visibility.Hidden)
-                .onClick { onShowMore() },
-            text = "Show more"
-        )
     }
 }

@@ -21,7 +21,11 @@ import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 
 @Composable
-fun MainSection(posts: ApiListResponse, breakpoint: Breakpoint) {
+fun MainSection(
+    posts: ApiListResponse,
+    breakpoint: Breakpoint,
+    onClick: (String) -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -37,7 +41,7 @@ fun MainSection(posts: ApiListResponse, breakpoint: Breakpoint) {
             when (posts) {
                 is ApiListResponse.Idle -> {}
                 is ApiListResponse.Success -> {
-                    MainPosts(breakpoint, posts.data)
+                    MainPosts(breakpoint, posts.data, onClick)
                 }
 
                 is ApiListResponse.Error -> {}
@@ -49,7 +53,8 @@ fun MainSection(posts: ApiListResponse, breakpoint: Breakpoint) {
 @Composable
 fun MainPosts(
     breakpoint: Breakpoint,
-    posts: List<SimplePost>
+    posts: List<SimplePost>,
+    onClick: (String) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -60,13 +65,14 @@ fun MainPosts(
         PostPreview(
             post = posts.first(),
             darkTheme = true,
-            thumbnailHeight = if (breakpoint == Breakpoint.XL) 640.px else 320.px
+            thumbnailHeight = if (breakpoint == Breakpoint.XL) 640.px else 320.px,
+            onClick = onClick
         )
 
         if (breakpoint == Breakpoint.XL && posts.count() >= 2) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(55.percent)
+                    .fillMaxWidth(80.percent)
                     .margin(left = 20.px)
             ) {
                 posts.drop(1).forEach {
@@ -75,7 +81,8 @@ fun MainPosts(
                         darkTheme = true,
                         vertical = false,
                         thumbnailHeight = 200.px,
-                        titleMaxLength = 1
+                        titleMaxLength = 1,
+                        onClick = onClick
                     )
                 }
             }
@@ -84,7 +91,8 @@ fun MainPosts(
 
             PostPreview(
                 post = posts[1],
-                darkTheme = true
+                darkTheme = true,
+                onClick = onClick
             )
         }
     }

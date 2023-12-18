@@ -44,7 +44,7 @@ import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import kotlinx.browser.document
 import kotlinx.coroutines.launch
 import org.example.blogmultiplatform.components.AdminPageLayout
-import org.example.blogmultiplatform.components.Posts
+import org.example.blogmultiplatform.components.PostsView
 import org.example.blogmultiplatform.components.SearchBar
 import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.SimplePost
@@ -220,7 +220,7 @@ fun MyPostsScreen() {
                 }
             }
 
-            Posts(
+            PostsView(
                 breakpoint = breakpoint,
                 showMoreVisibility = showMoreVisibility,
                 posts = myPosts,
@@ -232,6 +232,9 @@ fun MyPostsScreen() {
                         selectedPosts.remove(id)
                     }
                     switchText = parseSwitch(selectedPosts)
+                },
+                onClick = {
+                    context.router.navigateTo(Screen.AdminCreate.passPostId(it))
                 },
                 onShowMore = {
                     scope.launch {

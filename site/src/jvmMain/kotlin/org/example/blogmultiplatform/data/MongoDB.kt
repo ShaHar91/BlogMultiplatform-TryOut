@@ -65,6 +65,21 @@ class MongoDB(private val context: InitApiContext) : MongoRepository {
             .toList()
     }
 
+    override suspend fun readLatestPosts(skip: Int): List<SimplePost> {
+        return postCollection.withDocumentClass(SimplePost::class.java)
+            .find(
+                and(
+                    SimplePost::popular eq false,
+                    SimplePost::main eq false,
+                    SimplePost::sponsored eq false,
+                )
+            )
+            .sort(descending(SimplePost::date))
+            .skip(skip)
+            .limit(POSTS_PER_PAGE)
+            .toList()
+    }
+
     override suspend fun readMainPosts(): List<SimplePost> {
         return postCollection.withDocumentClass(SimplePost::class.java)
             .find(SimplePost::main eq true)
