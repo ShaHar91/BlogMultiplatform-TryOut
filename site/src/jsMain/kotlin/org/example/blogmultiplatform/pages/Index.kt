@@ -25,9 +25,11 @@ import org.example.blogmultiplatform.navigation.Screen
 import org.example.blogmultiplatform.sections.HeaderSection
 import org.example.blogmultiplatform.sections.MainSection
 import org.example.blogmultiplatform.sections.PostsSection
+import org.example.blogmultiplatform.sections.SponsoredPostSection
 import org.example.blogmultiplatform.utils.CommonConstants.POSTS_PER_PAGE
 import org.example.blogmultiplatform.utils.fetchLatestPosts
 import org.example.blogmultiplatform.utils.fetchMainPosts
+import org.example.blogmultiplatform.utils.fetchSponsoredPosts
 
 @Page
 @Composable
@@ -37,6 +39,7 @@ fun HomePage() {
     var overflowMenuOpened by remember { mutableStateOf(false) }
     var mainPosts by remember { mutableStateOf<ApiListResponse>(ApiListResponse.Idle) }
     val latestPosts = remember { mutableStateListOf<SimplePost>() }
+    val sponsoredPosts = remember { mutableStateListOf<SimplePost>() }
     var latestPostsToSkip by remember { mutableStateOf(0) }
     var showMoreLatest by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -54,6 +57,16 @@ fun HomePage() {
                     latestPosts.addAll(it.data)
                     latestPostsToSkip += it.data.count()
                     showMoreLatest = it.data.size >= POSTS_PER_PAGE
+                }
+            },
+            onError = { println(it) }
+        )
+
+        fetchSponsoredPosts(
+            onSuccess = {
+                if (it is ApiListResponse.Success) {
+                    sponsoredPosts.clear()
+                    sponsoredPosts.addAll(it.data)
                 }
             },
             onError = { println(it) }
@@ -109,6 +122,14 @@ fun HomePage() {
 
                 }
             },
+            onClick = {
+                context.router.navigateTo(Screen.AdminHome.route)
+            }
+        )
+
+        SponsoredPostSection(
+            breakpoint = breakpoint,
+            posts = sponsoredPosts,
             onClick = {
                 context.router.navigateTo(Screen.AdminHome.route)
             }

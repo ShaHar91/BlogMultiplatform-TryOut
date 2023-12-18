@@ -129,6 +129,18 @@ suspend fun fetchMainPosts(
     }
 }
 
+suspend fun fetchSponsoredPosts(
+    onSuccess: (ApiListResponse) -> Unit,
+    onError: (Exception) -> Unit
+) {
+    try {
+        val result = window.api.tryGet(apiPath = "readsponsoredposts")?.decodeToString()
+        onSuccess(result.parseData())
+    } catch (e: Exception) {
+        onError(e)
+    }
+}
+
 suspend fun fetchLatestPosts(
     skip: Int,
     onSuccess: (ApiListResponse) -> Unit,

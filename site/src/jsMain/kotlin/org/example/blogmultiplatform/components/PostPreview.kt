@@ -37,15 +37,14 @@ import com.varabyte.kobweb.compose.ui.modifiers.textOverflow
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.graphics.Image
 import com.varabyte.kobweb.silk.components.text.SpanText
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.models.Theme
-import org.example.blogmultiplatform.navigation.Screen
 import org.example.blogmultiplatform.utils.Constants.FONT_FAMILY
 import org.example.blogmultiplatform.utils.maxLines
 import org.example.blogmultiplatform.utils.parseDateString
+import org.jetbrains.compose.web.css.CSSColorValue
 import org.jetbrains.compose.web.css.CSSSizeValue
 import org.jetbrains.compose.web.css.CSSUnit
 import org.jetbrains.compose.web.css.LineStyle
@@ -63,6 +62,7 @@ fun PostPreview(
     selectableMode: Boolean = false,
     thumbnailHeight: CSSSizeValue<CSSUnit.px> = 320.px,
     titleMaxLength: Int = 2,
+    titleColor: CSSColorValue = Colors.Black,
     onCheckedChanged: (Boolean, String) -> Unit = { _, _ -> },
     onClick: (String) -> Unit
 ) {
@@ -71,7 +71,7 @@ fun PostPreview(
     if (vertical) {
         Column(
             modifier = modifier
-                .fillMaxWidth(if (darkTheme) 100.percent else 95.percent)
+                .fillMaxWidth(if (darkTheme || titleColor == Theme.Sponsored.rgb) 100.percent else 95.percent)
                 .margin(bottom = 24.px)
                 .padding(if (selectableMode) 10.px else 0.px)
                 .borderRadius(4.px)
@@ -98,13 +98,17 @@ fun PostPreview(
                 selectableMode = selectableMode,
                 thumbnailHeight = thumbnailHeight,
                 titleMaxLength = titleMaxLength,
-                checked = checked
+                checked = checked,
+                titleColor = titleColor
             )
         }
     } else {
         Row(
             modifier = modifier
                 .cursor(Cursor.Pointer)
+                .onClick {
+                    onClick(post.id)
+                }
         ) {
             PostContent(
                 post = post,
@@ -113,7 +117,8 @@ fun PostPreview(
                 selectableMode = selectableMode,
                 thumbnailHeight = thumbnailHeight,
                 titleMaxLength = titleMaxLength,
-                checked = checked
+                checked = checked,
+                titleColor = titleColor
             )
         }
     }
@@ -127,6 +132,7 @@ fun PostContent(
     selectableMode: Boolean = false,
     thumbnailHeight: CSSSizeValue<CSSUnit.px> = 320.px,
     titleMaxLength: Int,
+    titleColor: CSSColorValue,
     checked: Boolean
 ) {
     Image(
@@ -159,7 +165,7 @@ fun PostContent(
                 .fontFamily(FONT_FAMILY)
                 .fontSize(20.px)
                 .fontWeight(FontWeight.Bold)
-                .color(if (darkTheme) Colors.White else Colors.Black)
+                .color(if (darkTheme) Colors.White else titleColor)
                 .textOverflow(TextOverflow.Ellipsis)
                 .overflow(Overflow.Hidden)
                 .maxLines(titleMaxLength),
