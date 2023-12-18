@@ -60,6 +60,18 @@ suspend fun readMyPosts(context: ApiContext) {
     }
 }
 
+@Api("readmainposts")
+suspend fun readMainPosts(context: ApiContext) {
+    try {
+        val mainPosts = context.data.getValue<MongoDB>().readMainPosts()
+
+        context.res.setBody(ApiListResponse.Success(data = mainPosts))
+    } catch (e: Exception) {
+        context.logger.error(e.message.toString())
+        context.res.setBody(ApiListResponse.Error(e.message.toString()))
+    }
+}
+
 @Api("deleteselectedposts")
 suspend fun deleteSelectedPosts(context: ApiContext) {
     try {

@@ -10,6 +10,7 @@ import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.models.User
 import org.example.blogmultiplatform.utils.CommonConstants.POSTS_PER_PAGE
 import org.example.blogmultiplatform.utils.Constants.DATABASE_NAME
+import org.example.blogmultiplatform.utils.Constants.MAIN_POSTS_LIMIT
 import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.toList
 import org.litote.kmongo.descending
@@ -61,6 +62,14 @@ class MongoDB(private val context: InitApiContext) : MongoRepository {
             .sort(descending(SimplePost::date))
             .skip(skip)
             .limit(POSTS_PER_PAGE)
+            .toList()
+    }
+
+    override suspend fun readMainPosts(): List<SimplePost> {
+        return postCollection.withDocumentClass(SimplePost::class.java)
+            .find(SimplePost::main eq true)
+            .sort(descending(SimplePost::date))
+            .limit(MAIN_POSTS_LIMIT)
             .toList()
     }
 

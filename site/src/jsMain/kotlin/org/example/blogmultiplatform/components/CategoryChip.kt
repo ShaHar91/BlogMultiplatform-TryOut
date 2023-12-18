@@ -15,19 +15,25 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.Theme
 import org.example.blogmultiplatform.utils.Constants.FONT_FAMILY
+import org.jetbrains.compose.web.css.CSSColorValue
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.px
 
 @Composable
 fun CategoryChip(
-    category: Category
+    category: Category,
+    darkTheme: Boolean = false
 ) {
     Box(
         modifier = Modifier
             .height(32.px)
             .padding(leftRight = 14.px)
             .borderRadius(100.px)
-            .border(1.px, LineStyle.Solid, Theme.HalfBlack.rgb),
+            .border(
+                width = 1.px,
+                style = LineStyle.Solid,
+                color = if (darkTheme) Theme.entries.find { it.hex == category.color }?.rgb else  Theme.HalfBlack.rgb
+            ),
         contentAlignment = Alignment.Center
     ) {
         SpanText(
@@ -35,7 +41,7 @@ fun CategoryChip(
             modifier = Modifier
                 .fontFamily(FONT_FAMILY)
                 .fontSize(12.px)
-                .color(Theme.HalfBlack.rgb)
+                .color(if (darkTheme) Theme.entries.find { it.hex == category.color }?.rgb ?: Theme.HalfWhite.rgb else  Theme.HalfBlack.rgb)
         )
     }
 }
