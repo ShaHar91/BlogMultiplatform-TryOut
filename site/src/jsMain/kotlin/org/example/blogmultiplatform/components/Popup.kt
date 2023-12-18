@@ -49,14 +49,11 @@ fun MessagePopup(
     message: String,
     onDialogDismiss: () -> Unit
 ) {
-    val breakpoint = rememberBreakpoint()
-
     Box(
         modifier = Modifier
             .width(100.vw)
             .height(100.vh)
             .position(Position.Fixed)
-            .padding(left = if (breakpoint > Breakpoint.MD) Constants.SIDE_PANEL_WIDTH.px else 0.px)
             .zIndex(19),
         contentAlignment = Alignment.Center
     ) {

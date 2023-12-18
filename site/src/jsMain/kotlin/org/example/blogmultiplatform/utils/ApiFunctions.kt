@@ -8,6 +8,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.ApiResponse
+import org.example.blogmultiplatform.models.Newsletter
 import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.models.RandomJoke
 import org.example.blogmultiplatform.models.User
@@ -98,7 +99,7 @@ suspend fun updatePost(post: Post): Boolean {
             apiPath = "updatepost",
             body = Json.encodeToString(post).encodeToByteArray()
         )?.decodeToString().toBoolean()
-    } catch(e: Exception) {
+    } catch (e: Exception) {
         println(e.message)
         false
     }
@@ -200,6 +201,13 @@ suspend fun fetchSelectedPost(id: String): ApiResponse {
     } catch (e: Exception) {
         ApiResponse.Error(message = e.message.toString())
     }
+}
+
+suspend fun subscribeToNewsletter(newsletter: Newsletter): String {
+    return window.api.tryPost(
+        apiPath = "subscribe",
+        body = Json.encodeToString(newsletter).encodeToByteArray()
+    )?.decodeToString().toString().replace("\"", "")
 }
 
 inline fun <reified T> String?.parseData(): T {

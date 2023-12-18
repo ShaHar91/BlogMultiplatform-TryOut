@@ -99,3 +99,8 @@ fun Modifier.maxLines(maxLines: Int = Int.MAX_VALUE): Modifier {
 fun parseSwitch(posts: List<String>): String {
     return if(posts.size == 1) "1 Post Selected" else "${posts.size} Posts Selected"
 }
+
+fun validateEmail(email: String): Boolean {
+    val regex = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
+    return regex.toRegex().matches(email)
+}

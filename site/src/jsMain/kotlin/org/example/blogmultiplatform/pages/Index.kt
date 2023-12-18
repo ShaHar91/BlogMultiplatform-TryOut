@@ -24,6 +24,7 @@ import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.navigation.Screen
 import org.example.blogmultiplatform.sections.HeaderSection
 import org.example.blogmultiplatform.sections.MainSection
+import org.example.blogmultiplatform.sections.NewsletterSection
 import org.example.blogmultiplatform.sections.PostsSection
 import org.example.blogmultiplatform.sections.SponsoredPostSection
 import org.example.blogmultiplatform.utils.CommonConstants.POSTS_PER_PAGE
@@ -185,5 +186,7 @@ fun HomePage() {
                 context.router.navigateTo(Screen.AdminCreate.passPostId(it))
             }
         )
+
+        NewsletterSection(breakpoint)
     }
 }

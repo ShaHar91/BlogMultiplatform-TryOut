@@ -1,5 +1,6 @@
 package org.example.blogmultiplatform.data
 
+import org.example.blogmultiplatform.models.Newsletter
 import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.models.User
@@ -17,4 +18,5 @@ interface MongoRepository {
     suspend fun deleteSelectedPosts(ids: List<String>): Boolean
     suspend fun checkUserExistence(user: User): User?
     suspend fun checkUserId(id: String): Boolean
+    suspend fun subscribe(newsletter: Newsletter): String
 }

@@ -50,4 +50,6 @@ object Id {
 
     const val linkHrefInput = "linkHrefInput"
     const val linkTitleInput = "linkTitleInput"
+
+    const val emailInput = "emailInput"
 }
