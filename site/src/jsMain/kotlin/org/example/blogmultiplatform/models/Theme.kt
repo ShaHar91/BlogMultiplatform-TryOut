@@ -10,6 +10,7 @@ enum class Theme(
 ) {
     Primary(hex = "#00A2FF", rgb = rgb(r = 0, g = 162, b = 255)),
     Secondary(hex = "#001019", rgb = rgb(r = 0, g = 16, b = 25)),
+    Tertiary(hex = "#001925", rgb = rgb(r = 0, g = 25, b = 37)),
     LightGrey(hex = "#FAFAFA", rgb = rgb(r = 250, g = 250, b = 250)),
     Grey(hex = "#E9E9E9", rgb = rgb(r = 233, g = 233, b = 233)),
     DarkGrey(hex = "#646464", rgb = rgb(r = 100, g = 100, b = 100)),

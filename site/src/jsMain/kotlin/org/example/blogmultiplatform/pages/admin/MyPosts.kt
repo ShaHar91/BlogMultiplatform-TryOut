@@ -141,17 +141,21 @@ fun MyPostsScreen() {
                 contentAlignment = Alignment.Center
             ) {
                 SearchBar(
-                    Modifier
+                    breakpoint = breakpoint,
+                    fullWidth = true,
+                    modifier = Modifier
                         .visibility(if (selectableMode) Visibility.Hidden else Visibility.Visible)
-                        .transition(CSSTransition(TransitionProperty.All, 300.ms))
-                ) {
-                    val query = (document.getElementById(Id.adminSearchBar) as HTMLInputElement).value
-                    if (query.isNotEmpty()) {
-                        context.router.navigateTo(Screen.AdminMyPosts.searchByTitle(query))
-                    } else {
-                        context.router.navigateTo(Screen.AdminMyPosts.route)
+                        .transition(CSSTransition(TransitionProperty.All, 300.ms)),
+                    onSearchIconClick = {},
+                    onEnterClick = {
+                        val query = (document.getElementById(Id.adminSearchBar) as HTMLInputElement).value
+                        if (query.isNotEmpty()) {
+                            context.router.navigateTo(Screen.AdminMyPosts.searchByTitle(query))
+                        } else {
+                            context.router.navigateTo(Screen.AdminMyPosts.route)
+                        }
                     }
-                }
+                )
             }
 
             Row(
