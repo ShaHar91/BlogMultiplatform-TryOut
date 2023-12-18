@@ -29,6 +29,7 @@ import org.example.blogmultiplatform.sections.SponsoredPostSection
 import org.example.blogmultiplatform.utils.CommonConstants.POSTS_PER_PAGE
 import org.example.blogmultiplatform.utils.fetchLatestPosts
 import org.example.blogmultiplatform.utils.fetchMainPosts
+import org.example.blogmultiplatform.utils.fetchPopularPosts
 import org.example.blogmultiplatform.utils.fetchSponsoredPosts
 
 @Page
@@ -37,12 +38,20 @@ fun HomePage() {
     val context = rememberPageContext()
     val breakpoint = rememberBreakpoint()
     var overflowMenuOpened by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
     var mainPosts by remember { mutableStateOf<ApiListResponse>(ApiListResponse.Idle) }
+
     val latestPosts = remember { mutableStateListOf<SimplePost>() }
-    val sponsoredPosts = remember { mutableStateListOf<SimplePost>() }
     var latestPostsToSkip by remember { mutableStateOf(0) }
     var showMoreLatest by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
+
+    val popularPosts = remember { mutableStateListOf<SimplePost>() }
+    var popularPostsToSkip by remember { mutableStateOf(0) }
+    var showMorePopular by remember { mutableStateOf(false) }
+
+    val sponsoredPosts = remember { mutableStateListOf<SimplePost>() }
+
 
     LaunchedEffect(Unit) {
         fetchMainPosts(onSuccess = {
@@ -71,6 +80,19 @@ fun HomePage() {
             },
             onError = { println(it) }
         )
+
+        fetchPopularPosts(
+            skip = popularPostsToSkip,
+            onSuccess = {
+                if (it is ApiListResponse.Success) {
+                    popularPosts.clear()
+                    popularPosts.addAll(it.data)
+                    popularPostsToSkip += it.data.count()
+                    showMorePopular = it.data.size >= POSTS_PER_PAGE
+                }
+            },
+            onError = { println(it) }
+        )
     }
 
     Column(
@@ -94,7 +116,7 @@ fun HomePage() {
             breakpoint = breakpoint,
             posts = mainPosts,
             onClick = {
-                context.router.navigateTo(Screen.AdminHome.route)
+                context.router.navigateTo(Screen.AdminCreate.passPostId(it))
             }
         )
 
@@ -123,7 +145,7 @@ fun HomePage() {
                 }
             },
             onClick = {
-                context.router.navigateTo(Screen.AdminHome.route)
+                context.router.navigateTo(Screen.AdminCreate.passPostId(it))
             }
         )
 
@@ -131,7 +153,36 @@ fun HomePage() {
             breakpoint = breakpoint,
             posts = sponsoredPosts,
             onClick = {
-                context.router.navigateTo(Screen.AdminHome.route)
+                context.router.navigateTo(Screen.AdminCreate.passPostId(it))
+            }
+        )
+
+        PostsSection(
+            breakpoint = breakpoint,
+            posts = popularPosts,
+            title = "Popular Posts",
+            showMoreVisibility = showMorePopular,
+            onShowMore = {
+                scope.launch {
+                    fetchPopularPosts(
+                        skip = popularPostsToSkip,
+                        onSuccess = {
+                            if (it is ApiListResponse.Success) {
+                                if (it.data.isNotEmpty()) {
+                                    popularPosts.addAll(it.data)
+                                    popularPostsToSkip += it.data.count()
+                                    if (it.data.size < POSTS_PER_PAGE) showMorePopular = false
+                                } else {
+                                    showMorePopular = false
+                                }
+                            }
+                        },
+                        onError = { println(it) })
+
+                }
+            },
+            onClick = {
+                context.router.navigateTo(Screen.AdminCreate.passPostId(it))
             }
         )
     }

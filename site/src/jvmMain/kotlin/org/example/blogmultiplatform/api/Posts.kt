@@ -98,6 +98,20 @@ suspend fun readSponsoredPosts(context: ApiContext) {
     }
 }
 
+@Api("readpopularposts")
+suspend fun readPopularPosts(context: ApiContext) {
+    try {
+        val skip = context.req.params[SKIP_PARAM]?.toInt() ?: 0
+
+        val latestPosts = context.data.getValue<MongoDB>().readPopularPosts(skip)
+
+        context.res.setBody(ApiListResponse.Success(data = latestPosts))
+    } catch (e: Exception) {
+        context.logger.error(e.message.toString())
+        context.res.setBody(ApiListResponse.Error(e.message.toString()))
+    }
+}
+
 @Api("deleteselectedposts")
 suspend fun deleteSelectedPosts(context: ApiContext) {
     try {
