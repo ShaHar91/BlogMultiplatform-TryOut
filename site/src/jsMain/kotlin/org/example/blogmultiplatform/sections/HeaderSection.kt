@@ -26,14 +26,17 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaBars
 import com.varabyte.kobweb.silk.components.icons.fa.FaXmark
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
+import kotlinx.browser.document
 import org.example.blogmultiplatform.components.CategoryNavigationItems
 import org.example.blogmultiplatform.components.SearchBar
 import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.Theme
 import org.example.blogmultiplatform.navigation.Screen
+import org.example.blogmultiplatform.utils.Id
 import org.example.blogmultiplatform.utils.Res
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
+import org.w3c.dom.HTMLInputElement
 
 @Composable
 fun HeaderSection(
@@ -114,6 +117,15 @@ fun Header(
 
         Spacer()
 
-        SearchBar(breakpoint = breakpoint, darkTheme = true, fullWidth = fullSearchBarOpened, onEnterClick = { }, onSearchIconClick = { fullSearchBarOpened = it })
+        SearchBar(
+            breakpoint = breakpoint,
+            darkTheme = true,
+            fullWidth = fullSearchBarOpened,
+            onEnterClick = {
+                val query = (document.getElementById(Id.adminSearchBar) as HTMLInputElement).value
+                context.router.navigateTo(Screen.SearchPage.searchByTitle(query = query))
+            },
+            onSearchIconClick = { fullSearchBarOpened = it }
+        )
     }
 }
