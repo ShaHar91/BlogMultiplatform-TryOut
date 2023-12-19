@@ -80,7 +80,7 @@ fun NewsletterSection(
 
     Box(
         modifier = Modifier
-            .margin(topBottom = 250.px)
+            .margin(topBottom = 100.px)
             .fillMaxWidth()
             .maxWidth(1920.px)
     ) {

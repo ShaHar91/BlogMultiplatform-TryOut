@@ -198,7 +198,7 @@ fun SearchPage() {
                     }
                 },
                 onClick = {
-                    context.router.navigateTo(Screen.AdminCreate.passPostId(it))
+                    context.router.navigateTo(Screen.PostPage.getPost(it))
                 }
             )
         } else {

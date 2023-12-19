@@ -38,6 +38,7 @@ fun SponsoredPostSection(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .margin(bottom = 100.px)
             .backgroundColor(Theme.LightGrey.rgb),
         contentAlignment = Alignment.Center
     ) {

@@ -20,10 +20,14 @@ sealed class Screen(val route: String) {
         fun postUpdated() = "/admin/success?updated=true"
     }
 
-    data object HomePage: Screen(route = "/")
+    data object HomePage : Screen(route = "/")
 
-    data object SearchPage: Screen(route = "/search/query") {
+    data object SearchPage : Screen(route = "/search/query") {
         fun searchByTitle(query: String) = "/search/query?$QUERY_PARAM=$query"
-        fun searchByCategory(category: Category)= "/search/query?$CATEGORY_PARAM=${category.name}"
+        fun searchByCategory(category: Category) = "/search/query?$CATEGORY_PARAM=${category.name}"
+    }
+
+    data object PostPage : Screen(route = "/posts/post") {
+        fun getPost(id: String) = "/posts/post?$POST_ID_PARAM=$id"
     }
 }

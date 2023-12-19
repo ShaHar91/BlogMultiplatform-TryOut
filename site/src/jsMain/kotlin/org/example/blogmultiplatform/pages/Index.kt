@@ -117,7 +117,7 @@ fun HomePage() {
             breakpoint = breakpoint,
             posts = mainPosts,
             onClick = {
-                context.router.navigateTo(Screen.AdminCreate.passPostId(it))
+                context.router.navigateTo(Screen.PostPage.getPost(it))
             }
         )
 
@@ -146,7 +146,7 @@ fun HomePage() {
                 }
             },
             onClick = {
-                context.router.navigateTo(Screen.AdminCreate.passPostId(it))
+                context.router.navigateTo(Screen.PostPage.getPost(it))
             }
         )
 
@@ -154,7 +154,7 @@ fun HomePage() {
             breakpoint = breakpoint,
             posts = sponsoredPosts,
             onClick = {
-                context.router.navigateTo(Screen.AdminCreate.passPostId(it))
+                context.router.navigateTo(Screen.PostPage.getPost(it))
             }
         )
 
@@ -183,7 +183,7 @@ fun HomePage() {
                 }
             },
             onClick = {
-                context.router.navigateTo(Screen.AdminCreate.passPostId(it))
+                context.router.navigateTo(Screen.PostPage.getPost(it))
             }
         )
 

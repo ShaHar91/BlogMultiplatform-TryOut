@@ -38,9 +38,11 @@ import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.graphics.Image
+import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.text.SpanText
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.models.Theme
+import org.example.blogmultiplatform.styles.PostPreviewStyle
 import org.example.blogmultiplatform.utils.Constants.FONT_FAMILY
 import org.example.blogmultiplatform.utils.maxLines
 import org.example.blogmultiplatform.utils.parseDateString
@@ -70,7 +72,8 @@ fun PostPreview(
 
     if (vertical) {
         Column(
-            modifier = modifier
+            modifier = PostPreviewStyle.toModifier()
+                .then(modifier)
                 .fillMaxWidth(if (darkTheme || titleColor == Theme.Sponsored.rgb) 100.percent else 95.percent)
                 .margin(bottom = 24.px)
                 .padding(if (selectableMode) 10.px else 0.px)
@@ -104,7 +107,8 @@ fun PostPreview(
         }
     } else {
         Row(
-            modifier = modifier
+            modifier = PostPreviewStyle.toModifier()
+                .then(modifier)
                 .cursor(Cursor.Pointer)
                 .onClick {
                     onClick(post.id)
