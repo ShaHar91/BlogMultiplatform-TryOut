@@ -8,12 +8,14 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.ApiResponse
+import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.Newsletter
 import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.models.RandomJoke
 import org.example.blogmultiplatform.models.User
 import org.example.blogmultiplatform.models.UserWithoutPassword
 import org.example.blogmultiplatform.utils.CommonConstants.AUTHOR_PARAM
+import org.example.blogmultiplatform.utils.CommonConstants.CATEGORY_PARAM
 import org.example.blogmultiplatform.utils.CommonConstants.POST_ID_PARAM
 import org.example.blogmultiplatform.utils.CommonConstants.QUERY_PARAM
 import org.example.blogmultiplatform.utils.CommonConstants.SKIP_PARAM
@@ -186,6 +188,18 @@ suspend fun searchPostsByTitle(query: String, skip: Int, onSuccess: (ApiListResp
     try {
         val result = window.api.tryGet(
             apiPath = "searchposts?$QUERY_PARAM=$query&$SKIP_PARAM=$skip",
+        )?.decodeToString()
+
+        onSuccess(result.parseData())
+    } catch (e: Exception) {
+        onError(e)
+    }
+}
+
+suspend fun searchPostsByCategory(category: Category, skip: Int, onSuccess: (ApiListResponse) -> Unit, onError: (Exception) -> Unit) {
+    try {
+        val result = window.api.tryGet(
+            apiPath = "searchpostsbycategory?$CATEGORY_PARAM=${category.name}&$SKIP_PARAM=$skip",
         )?.decodeToString()
 
         onSuccess(result.parseData())

@@ -20,6 +20,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.width
+import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.graphics.Image
 import com.varabyte.kobweb.silk.components.icons.fa.FaBars
 import com.varabyte.kobweb.silk.components.icons.fa.FaXmark
@@ -27,7 +28,9 @@ import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import org.example.blogmultiplatform.components.CategoryNavigationItems
 import org.example.blogmultiplatform.components.SearchBar
+import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.Theme
+import org.example.blogmultiplatform.navigation.Screen
 import org.example.blogmultiplatform.utils.Res
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
@@ -35,6 +38,7 @@ import org.jetbrains.compose.web.css.px
 @Composable
 fun HeaderSection(
     breakpoint: Breakpoint,
+    selectedCategory: Category? = null,
     onMenuOpen: () -> Unit
 ) {
     Box(
@@ -49,7 +53,7 @@ fun HeaderSection(
                 .maxWidth(1920.px),
             contentAlignment = Alignment.TopCenter
         ) {
-            Header(breakpoint, onMenuOpen)
+            Header(breakpoint, selectedCategory, onMenuOpen)
         }
     }
 }
@@ -57,8 +61,10 @@ fun HeaderSection(
 @Composable
 fun Header(
     breakpoint: Breakpoint,
+    selectedCategory: Category?,
     onMenuOpen: () -> Unit
 ) {
+    val context = rememberPageContext()
     var fullSearchBarOpened by remember { mutableStateOf(false) }
 
     Row(
@@ -86,7 +92,7 @@ fun Header(
                     .width(if (breakpoint >= Breakpoint.SM) 100.px else 70.px)
                     .cursor(Cursor.Pointer)
                     .onClick {
-
+                        context.router.navigateTo(Screen.HomePage.route)
                     },
                 src = Res.Image.logo,
                 description = "Logo Image"
@@ -103,7 +109,7 @@ fun Header(
         }
 
         if (breakpoint >= Breakpoint.LG) {
-            CategoryNavigationItems()
+            CategoryNavigationItems(selectedCategory = selectedCategory)
         }
 
         Spacer()

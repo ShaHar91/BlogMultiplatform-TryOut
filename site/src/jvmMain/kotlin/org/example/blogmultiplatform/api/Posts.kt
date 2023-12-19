@@ -11,9 +11,11 @@ import kotlinx.serialization.json.Json
 import org.example.blogmultiplatform.data.MongoDB
 import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.ApiResponse
+import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.utils.CommonConstants
 import org.example.blogmultiplatform.utils.CommonConstants.AUTHOR_PARAM
+import org.example.blogmultiplatform.utils.CommonConstants.CATEGORY_PARAM
 import org.example.blogmultiplatform.utils.CommonConstants.POST_ID_PARAM
 import org.example.blogmultiplatform.utils.CommonConstants.QUERY_PARAM
 import org.example.blogmultiplatform.utils.CommonConstants.SKIP_PARAM
@@ -135,6 +137,22 @@ suspend fun searchPostsByTitle(context: ApiContext) {
 
         context.res.setBody(ApiListResponse.Success(data = request))
     } catch (e: Exception) {
+        context.res.setBody(ApiListResponse.Error(e.message.toString()))
+    }
+}
+
+@Api("searchpostsbycategory")
+suspend fun searchPostsByCategory(context: ApiContext) {
+    try {
+        println(context.req.params[CATEGORY_PARAM])
+
+        val category = Category.valueOf(context.req.params[CommonConstants.CATEGORY_PARAM] ?: Category.Programming.name)
+        val skip = context.req.params[SKIP_PARAM]?.toInt() ?: 0
+        val request = context.data.getValue<MongoDB>().searchPostsByCategory(category, skip)
+
+        context.res.setBody(ApiListResponse.Success(data = request))
+    } catch (e: Exception) {
+        println("Errore!!!!!")
         context.res.setBody(ApiListResponse.Error(e.message.toString()))
     }
 }

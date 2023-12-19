@@ -5,6 +5,7 @@ import com.varabyte.kobweb.api.init.InitApi
 import com.varabyte.kobweb.api.init.InitApiContext
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitLast
+import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.Newsletter
 import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.models.SimplePost
@@ -111,6 +112,15 @@ class MongoDB(private val context: InitApiContext) : MongoRepository {
         val regexQuery = query.toRegex(RegexOption.IGNORE_CASE)
         return postCollection.withDocumentClass(SimplePost::class.java)
             .find(SimplePost::title regex regexQuery)
+            .sort(descending(SimplePost::date))
+            .skip(skip)
+            .limit(POSTS_PER_PAGE)
+            .toList()
+    }
+
+    override suspend fun searchPostsByCategory(category: Category, skip: Int): List<SimplePost> {
+        return postCollection.withDocumentClass(SimplePost::class.java)
+            .find(SimplePost::category eq category)
             .sort(descending(SimplePost::date))
             .skip(skip)
             .limit(POSTS_PER_PAGE)

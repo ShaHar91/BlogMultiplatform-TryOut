@@ -105,7 +105,7 @@ fun HomePage() {
             OverflowSidePanel(
                 onMenuClose = { overflowMenuOpened = false }
             ) {
-                CategoryNavigationItems(true)
+                CategoryNavigationItems(vertical = true)
             }
         }
 
