@@ -1,11 +1,10 @@
 package com.christiano.androidapp.screens.home
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -14,19 +13,29 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.christiano.androidapp.components.PostCard
+import com.christiano.androidapp.components.PostCardsView
 import com.christiano.androidapp.models.Post
 import com.christiano.androidapp.ui.theme.BlogMultiplatformTheme
 import com.christiano.androidapp.util.RequestState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(posts: RequestState<List<Post>>) {
+fun HomeScreen(
+    posts: RequestState<List<Post>>,
+    searchedPosts: RequestState<List<Post>>,
+    query: String,
+    searchbarOpened: Boolean,
+    onSearchBarChanged: (Boolean) -> Unit,
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    active: Boolean,
+    onActiveChange: (Boolean) -> Unit,
+) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -39,7 +48,10 @@ fun HomeScreen(posts: RequestState<List<Post>>) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        onSearchBarChanged(true)
+                        onActiveChange(true)
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search Icon",
@@ -48,25 +60,58 @@ fun HomeScreen(posts: RequestState<List<Post>>) {
                     }
                 }
             )
-        }
-    ) { paddingValues ->
-        if (posts is RequestState.Success) {
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(
-                    items = posts.data,
-                    key = { post -> post._id}
+            if (searchbarOpened) {
+                SearchBar(
+                    query = query,
+                    onQueryChange = onQueryChange,
+                    onSearch = onSearch,
+                    active = active,
+                    onActiveChange = onActiveChange,
+                    leadingIcon = {
+                        IconButton(onClick = {
+                            onSearchBarChanged(false)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back Arrow Icon",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            onQueryChange("")
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close Icon",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    },
+                    placeholder = {
+                        Text(
+                            text = "Search here"
+                        )
+                    }
                 ) {
-                    PostCard(post = it, onPostClick = {})
+                    PostCardsView(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        posts = searchedPosts
+                    )
                 }
             }
         }
+    ) { paddingValues ->
+        PostCardsView(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            hideMessage = true,
+            posts = posts
+        )
     }
 }
 
@@ -74,6 +119,16 @@ fun HomeScreen(posts: RequestState<List<Post>>) {
 @Composable
 fun HomeScreenPreview() {
     BlogMultiplatformTheme {
-        HomeScreen(RequestState.Idle)
+        HomeScreen(
+            posts = RequestState.Idle,
+            searchedPosts = RequestState.Idle,
+            query = "",
+            searchbarOpened = false,
+            onSearchBarChanged = { },
+            onQueryChange = {},
+            onSearch = {},
+            active = false,
+            onActiveChange = {}
+        )
     }
 }

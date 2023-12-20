@@ -1,11 +1,14 @@
 package com.christiano.androidapp.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
@@ -26,6 +29,7 @@ import coil.request.ImageRequest
 import com.christiano.androidapp.models.Category
 import com.christiano.androidapp.models.Post
 import com.christiano.androidapp.ui.theme.BlogMultiplatformTheme
+import com.christiano.androidapp.util.RequestState
 import com.christiano.androidapp.util.convertLongToDate
 
 @Composable
@@ -100,6 +104,47 @@ fun PostCard(
                     }
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun PostCardsView(
+    modifier: Modifier = Modifier,
+    hideMessage: Boolean = false,
+    posts: RequestState<List<Post>>
+) {
+    when (posts) {
+        is RequestState.Success -> {
+            if (posts.data.isNotEmpty()) {
+                LazyColumn(
+                    modifier = modifier
+                        .padding(top = 12.dp, bottom = 12.dp)
+                        .padding(horizontal = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(
+                        items = posts.data,
+                        key = { post -> post._id }
+                    ) {
+                        PostCard(post = it, onPostClick = {})
+                    }
+                }
+            } else {
+                EmptyUI()
+            }
+        }
+
+        is RequestState.Error -> {
+            EmptyUI(message = posts.error.message.toString())
+        }
+
+        is RequestState.Idle -> {
+            EmptyUI(hideMessage)
+        }
+
+        is RequestState.Loading -> {
+            EmptyUI(loading = true)
         }
     }
 }

@@ -19,6 +19,9 @@ class HomeViewModel : ViewModel() {
     private val _allPosts: MutableState<RequestState<List<Post>>> = mutableStateOf(RequestState.Idle)
     val allPosts: State<RequestState<List<Post>>> = _allPosts
 
+    private val _searchedPosts: MutableState<RequestState<List<Post>>> = mutableStateOf(RequestState.Idle)
+    val searchedPosts: State<RequestState<List<Post>>> = _searchedPosts
+
     init {
         viewModelScope.launch {
             Log.d("TAG", "Hello--")
@@ -29,9 +32,19 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    private fun fetchAllPosts() {
+    private suspend fun fetchAllPosts() {
+        _allPosts.value = RequestState.Loading
+        MongoSync.readAllPosts().collectLatest { _allPosts.value = it }
+    }
+
+    fun searchPostsByTitle(query: String) {
+        _searchedPosts.value = RequestState.Loading
         viewModelScope.launch {
-            MongoSync.readAllPosts().collectLatest { _allPosts.value = it }
+            MongoSync.searchPostsByTitle(query = query).collectLatest { _searchedPosts.value = it }
         }
+    }
+
+    fun resetSearchPosts() {
+        _searchedPosts.value = RequestState.Idle
     }
 }
