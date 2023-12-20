@@ -8,20 +8,58 @@ kotlin-js-store
 *.iml
 /*.ipr
 
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/gradle.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-/.idea/artifacts
-/.idea/compiler.xml
-/.idea/jarRepositories.xml
-/.idea/*.iml
-/.idea/modules
-/.idea/libraries-with-intellij-classes.xml
-
 # Gradle ignores
 .gradle
 
+# built application files
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+bin/
+gen/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Eclipse project files
+.classpath
+.project
+
+# Android Studio
+.idea/
+.idea
+/.idea/
+*/local.properties
+
+*/production
+
+*.iws
+*.swp
+
+# zsh-plugins
+.gradletasknamecache
+com_crashlytics_export_strings.xml
+crashlytics-build.properties
+crashlytics.properties
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/test_output
+fastlane/README.md
+fastlane/build
+
+#keystore en json ignoren
+signing.jks
+gc_fastlane_keys.json
+signing.gradle
+
+#zodat Bitrise CI dirty kan managen fix for detached header
+Vendor
