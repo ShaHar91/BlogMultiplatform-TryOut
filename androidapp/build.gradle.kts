@@ -72,5 +72,5 @@ dependencies {
     implementation(libs.kotlinx.serialization)
     debugImplementation(libs.androidx.ui.tooling)
 
-//    implementation(project(":site"))
+    implementation(project(":shared"))
 }

@@ -46,12 +46,3 @@ open class Post : RealmObject {
     }
 }
 
-enum class Category {
-    Technology,
-    Programming,
-    Design;
-
-    companion object {
-        fun parseName(name: String) = runCatching { Category.valueOf(name) }.getOrElse { Programming }
-    }
-}
