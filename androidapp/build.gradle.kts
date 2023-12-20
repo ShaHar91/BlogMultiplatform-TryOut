@@ -50,8 +50,6 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/**"
-            excludes += "/kotlin/**"
-            excludes += "DebugProbesKt.bin"
         }
     }
 }

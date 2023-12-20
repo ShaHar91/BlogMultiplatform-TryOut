@@ -24,13 +24,13 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.christiano.androidapp.models.Category
-import com.christiano.androidapp.models.PostSync
+import com.christiano.androidapp.models.Post
 import com.christiano.androidapp.ui.theme.BlogMultiplatformTheme
 import com.christiano.androidapp.util.convertLongToDate
 
 @Composable
 fun PostCard(
-    post: PostSync,
+    post: Post,
     onPostClick: (String) -> Unit
 ) {
     val context = LocalContext.current
@@ -108,6 +108,6 @@ fun PostCard(
 @Composable
 fun PostCardPreview() {
     BlogMultiplatformTheme {
-        PostCard(post = PostSync.previewData(), onPostClick = {})
+        PostCard(post = Post.previewData(), onPostClick = {})
     }
 }

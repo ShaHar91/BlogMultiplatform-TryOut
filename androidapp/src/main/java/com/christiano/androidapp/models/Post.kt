@@ -8,7 +8,7 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-open class PostSync : RealmObject {
+open class Post : RealmObject {
     @PrimaryKey
     var _id: String = ""
     var author: String = ""
@@ -19,7 +19,7 @@ open class PostSync : RealmObject {
     var category: String = Category.Programming.name
 
     companion object {
-        fun previewData() = PostSync().also {
+        fun previewData() = Post().also {
             it._id = "123"
             it.author = "Stefan"
             it.date = 1690805975525L
