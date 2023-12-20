@@ -22,6 +22,7 @@ import org.example.blogmultiplatform.components.OverflowSidePanel
 import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.navigation.Screen
+import org.example.blogmultiplatform.sections.FooterSection
 import org.example.blogmultiplatform.sections.HeaderSection
 import org.example.blogmultiplatform.sections.MainSection
 import org.example.blogmultiplatform.sections.NewsletterSection
@@ -188,5 +189,7 @@ fun HomePage() {
         )
 
         NewsletterSection(breakpoint)
+
+        FooterSection()
     }
 }

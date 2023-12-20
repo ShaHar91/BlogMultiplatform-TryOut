@@ -41,6 +41,7 @@ import org.example.blogmultiplatform.components.OverflowSidePanel
 import org.example.blogmultiplatform.models.ApiResponse
 import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.models.Theme
+import org.example.blogmultiplatform.sections.FooterSection
 import org.example.blogmultiplatform.sections.HeaderSection
 import org.example.blogmultiplatform.utils.CommonConstants.POST_ID_PARAM
 import org.example.blogmultiplatform.utils.Constants.FONT_FAMILY
@@ -114,6 +115,8 @@ fun PostPage() {
                 }
             }
         }
+
+        FooterSection()
     }
 }
 
@@ -123,14 +126,11 @@ fun PostContent(
 ) {
     LaunchedEffect(post) {
         (document.getElementById(Id.postContent) as HTMLDivElement).innerHTML = post.content
-//        println("Hello")
-//        js("hljs.highlightAll()") as Unit
-//        println("Bye")
     }
 
     Column(
         modifier = Modifier
-            .margin(top = 50.px, bottom = 100.px)
+            .margin(top = 50.px, bottom = 100.px, leftRight = 24.px)
             .fillMaxWidth()
             .maxWidth(800.px),
         horizontalAlignment = Alignment.CenterHorizontally

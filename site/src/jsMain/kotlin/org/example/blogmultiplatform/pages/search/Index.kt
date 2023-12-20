@@ -31,6 +31,7 @@ import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.navigation.Screen
+import org.example.blogmultiplatform.sections.FooterSection
 import org.example.blogmultiplatform.sections.HeaderSection
 import org.example.blogmultiplatform.sections.PostsSection
 import org.example.blogmultiplatform.utils.CommonConstants.CATEGORY_PARAM
@@ -204,5 +205,7 @@ fun SearchPage() {
         } else {
             LoadingIndicator()
         }
+
+        FooterSection()
     }
 }
