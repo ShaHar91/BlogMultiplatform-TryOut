@@ -7,8 +7,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.christiano.androidapp.models.Category
+import com.christiano.androidapp.screens.category.CategoryScreen
+import com.christiano.androidapp.screens.category.CategoryViewModel
 import com.christiano.androidapp.screens.home.HomeScreen
 import com.christiano.androidapp.screens.home.HomeViewModel
 
@@ -46,11 +51,28 @@ fun SetupNavGraph(navController: NavHostController) {
                         searchbarOpened = false
                         viewModel.resetSearchPosts()
                     }
-                }
+                },
+                onCategorySelect = {
+                    navController.navigate(Screen.Category.passCategory(it))
+                },
+                onPostClick = {}
             )
         }
-        composable(route = Screen.Category.route) {
+        composable(
+            route = Screen.Category.route,
+            arguments = listOf(navArgument("category") {
+                type = NavType.StringType
+            })
+        ) {
+            val viewModel: CategoryViewModel = viewModel()
+            val selectedCategory = it.arguments?.getString("category") ?: Category.Programming.name
 
+            CategoryScreen(
+                posts = viewModel.categoryPosts.value,
+                category = Category.parseName(selectedCategory),
+                onBackPress = { navController.popBackStack() },
+                onPostClick = { }
+            )
         }
         composable(route = Screen.Details.route) {
 

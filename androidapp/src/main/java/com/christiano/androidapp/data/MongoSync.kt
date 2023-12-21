@@ -1,5 +1,6 @@
 package com.christiano.androidapp.data
 
+import com.christiano.androidapp.models.Category
 import com.christiano.androidapp.models.Post
 import com.christiano.androidapp.util.Constants.APP_ID
 import com.christiano.androidapp.util.RequestState
@@ -55,6 +56,20 @@ object MongoSync : MongoSyncRepository {
 
         return try {
             realm.query<Post>(query = "title CONTAINS[c] $0", query)
+                .asFlow()
+                .map { result ->
+                    RequestState.Success(data = result.list)
+                }
+        } catch (e: Exception) {
+            flow { emit(RequestState.Error(e)) }
+        }
+    }
+
+    override fun searchPostsByCategory(category: Category): Flow<RequestState<List<Post>>> {
+        if (user == null) return flow { emit(RequestState.Error(Exception("User not authenticated."))) }
+
+        return try {
+            realm.query<Post>(query = "category == $0", category.name)
                 .asFlow()
                 .map { result ->
                     RequestState.Success(data = result.list)
