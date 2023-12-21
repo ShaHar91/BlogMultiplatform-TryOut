@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import com.christiano.androidapp.models.Category
 import com.christiano.androidapp.screens.category.CategoryScreen
 import com.christiano.androidapp.screens.category.CategoryViewModel
+import com.christiano.androidapp.screens.details.DetailsScreen
 import com.christiano.androidapp.screens.home.HomeScreen
 import com.christiano.androidapp.screens.home.HomeViewModel
 
@@ -55,7 +56,7 @@ fun SetupNavGraph(navController: NavHostController) {
                 onCategorySelect = {
                     navController.navigate(Screen.Category.passCategory(it))
                 },
-                onPostClick = {}
+                onPostClick = { navController.navigate(Screen.Details.passPostId(it)) }
             )
         }
         composable(
@@ -71,11 +72,22 @@ fun SetupNavGraph(navController: NavHostController) {
                 posts = viewModel.categoryPosts.value,
                 category = Category.parseName(selectedCategory),
                 onBackPress = { navController.popBackStack() },
-                onPostClick = { }
+                onPostClick = { navController.navigate(Screen.Details.passPostId(it)) }
             )
         }
-        composable(route = Screen.Details.route) {
-
+        composable(
+            route = Screen.Details.route,
+            arguments = listOf(
+                navArgument("postId") {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            val postId = it.arguments?.getString("postId")
+            DetailsScreen(
+                url = "http://10.0.2.2:8080/posts/post?postId=$postId",
+                onBackPress = { navController.popBackStack() }
+            )
         }
     }
 }
