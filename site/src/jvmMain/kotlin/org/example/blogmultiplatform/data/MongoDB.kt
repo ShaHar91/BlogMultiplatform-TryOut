@@ -25,15 +25,13 @@ import org.litote.kmongo.setValue
 
 @InitApi
 fun initMongoDB(context: InitApiContext) {
+    println("Whatever this is!!! \n${System.getenv()}")
+
     System.setProperty("org.litote.mongo.test.mapping.service", "org.litote.kmongo.serialization.SerializationClassMappingTypeService")
     context.data.add(MongoDB(context))
 }
 
 class MongoDB(private val context: InitApiContext) : MongoRepository {
-
-    init {
-        println("Whatever this is!!! \n${System.getenv()}")
-    }
 
     //    private val client = KMongo.createClient()
     private val client = KMongo.createClient(System.getenv("MONGODB_URI") ?: "")
