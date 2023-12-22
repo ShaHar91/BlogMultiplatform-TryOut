@@ -42,6 +42,7 @@ local.properties
 
 *.iws
 *.swp
+*.hprof
 
 # zsh-plugins
 .gradletasknamecache
