@@ -395,7 +395,7 @@ fun CreateScreen() {
                                 val result = addPost(
                                     post.copy(
                                         author = localStorage.getItem("username").toString(),
-                                        date = Date.now().toLong()
+                                        date = Date.now()
                                     )
                                 )
 

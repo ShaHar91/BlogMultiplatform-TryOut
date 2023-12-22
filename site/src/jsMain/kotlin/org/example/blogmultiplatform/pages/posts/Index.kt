@@ -158,7 +158,7 @@ fun PostContent(
                 .fontFamily(FONT_FAMILY)
                 .fontSize(14.px)
                 .color(Theme.HalfBlack.rgb),
-            text = post.date.parseDateString()
+            text = post.date.toLong().parseDateString()
         )
 
         SpanText(
