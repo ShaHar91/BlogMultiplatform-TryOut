@@ -8,13 +8,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.FontWeight
+import com.varabyte.kobweb.compose.css.ObjectFit
+import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.css.TextOverflow
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
-import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxSize
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
@@ -25,17 +26,21 @@ import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.id
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.objectFit
+import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.textOverflow
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.graphics.Image
+import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import kotlinx.browser.document
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.example.blogmultiplatform.ConstantsCommon
 import org.example.blogmultiplatform.components.CategoryNavigationItems
 import org.example.blogmultiplatform.components.ErrorView
 import org.example.blogmultiplatform.components.LoadingIndicator
@@ -62,13 +67,17 @@ fun PostPage() {
     var overflowOpened by remember { mutableStateOf(false) }
     val breakpoint = rememberBreakpoint()
     val scope = rememberCoroutineScope()
-
+    var showSections by remember { mutableStateOf(true) }
     var apiResponse by remember { mutableStateOf<ApiResponse>(ApiResponse.Idle) }
     val hasPostIdParam = remember(context.route) {
         context.route.params.containsKey(POST_ID_PARAM)
     }
 
     LaunchedEffect(context.route) {
+        showSections = if (context.route.params.containsKey(ConstantsCommon.SHOW_SECTIONS_PARAM)) {
+            context.route.params.getValue(ConstantsCommon.SHOW_SECTIONS_PARAM).toBoolean()
+        } else true
+
         if (hasPostIdParam) {
             val postId = context.route.params.getValue(POST_ID_PARAM)
             apiResponse = fetchSelectedPost(postId)
@@ -91,10 +100,12 @@ fun PostPage() {
             )
         }
 
-        HeaderSection(
-            breakpoint = breakpoint,
-            onMenuOpen = { overflowOpened = true }
-        )
+        if (showSections) {
+            HeaderSection(
+                breakpoint = breakpoint,
+                onMenuOpen = { overflowOpened = true }
+            )
+        }
 
         when (apiResponse) {
             is ApiResponse.Error -> {
@@ -106,7 +117,7 @@ fun PostPage() {
             }
 
             is ApiResponse.Success -> {
-                PostContent(post = (apiResponse as ApiResponse.Success).data)
+                PostContent(breakpoint = breakpoint, post = (apiResponse as ApiResponse.Success).data)
                 scope.launch {
                     delay(50)
                     try {
@@ -118,12 +129,15 @@ fun PostPage() {
             }
         }
 
-        FooterSection()
+        if (showSections) {
+            FooterSection()
+        }
     }
 }
 
 @Composable
 fun PostContent(
+    breakpoint: Breakpoint,
     post: Post
 ) {
     LaunchedEffect(post) {
@@ -155,6 +169,7 @@ fun PostContent(
                 .fontWeight(FontWeight.Bold)
                 .margin(bottom = 20.px)
                 .textOverflow(TextOverflow.Ellipsis)
+                .overflow(Overflow.Hidden)
                 .color(Colors.Black)
                 .maxLines(2),
             text = post.title
@@ -163,7 +178,12 @@ fun PostContent(
         Image(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(600.px),
+                .objectFit(ObjectFit.Cover)
+                .height(
+                    if (breakpoint <= Breakpoint.SM) 250.px
+                    else if (breakpoint <= Breakpoint.MD) 400.px
+                    else 600.px
+                ),
             src = post.thumbnail
         )
 
