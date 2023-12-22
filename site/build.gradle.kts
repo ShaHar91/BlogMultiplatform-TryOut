@@ -41,6 +41,8 @@ kobweb {
 kotlin {
     configAsKobwebApplication("blogmultiplatform", includeServer = true)
 
+    jvmToolchain(17)
+
     sourceSets {
         val commonMain by getting {
             dependencies {
