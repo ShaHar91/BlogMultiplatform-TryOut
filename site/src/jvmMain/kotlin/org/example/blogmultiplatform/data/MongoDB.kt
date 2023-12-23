@@ -1,23 +1,21 @@
 package org.example.blogmultiplatform.data
 
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Sorts.descending
+import com.mongodb.client.model.Updates
+import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.varabyte.kobweb.api.data.add
 import com.varabyte.kobweb.api.init.InitApi
 import com.varabyte.kobweb.api.init.InitApiContext
-import kotlinx.coroutines.reactive.awaitFirst
-import kotlinx.coroutines.reactive.awaitLast
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import org.example.blogmultiplatform.models.*
 import org.example.blogmultiplatform.utils.CommonConstants.POSTS_PER_PAGE
 import org.example.blogmultiplatform.utils.Constants.DATABASE_NAME
 import org.example.blogmultiplatform.utils.Constants.MAIN_POSTS_LIMIT
-import org.litote.kmongo.*
-import org.litote.kmongo.coroutine.toList
-import org.litote.kmongo.reactivestreams.KMongo
-import org.litote.kmongo.reactivestreams.getCollection
 
 @InitApi
 fun initMongoDB(context: InitApiContext) {
-    println("Whatever this is!!! \n${System.getenv()}")
-
     System.setProperty(
         "org.litote.mongo.test.mapping.service",
         "org.litote.kmongo.serialization.SerializationClassMappingTypeService"
@@ -31,40 +29,39 @@ fun initMongoDB(context: InitApiContext) {
 
 class MongoDB(private val context: InitApiContext, connectionString: String) : MongoRepository {
 
-    //    private val client = KMongo.createClient()
-    private val client = KMongo.createClient(connectionString)
+    private val client = MongoClient.create(connectionString)
+
     private val database = client.getDatabase(DATABASE_NAME)
-    private val userCollection = database.getCollection<User>()
-    private val postCollection = database.getCollection<Post>()
-    private val newsletterCollection = database.getCollection<Newsletter>()
+    private val userCollection = database.getCollection<User>("user")
+    private val postCollection = database.getCollection<Post>("post")
+    private val newsletterCollection = database.getCollection<Newsletter>("newsletter")
 
     override suspend fun addPost(post: Post): Boolean {
-        return postCollection.insertOne(post).awaitFirst().wasAcknowledged()
+        return postCollection.insertOne(post).wasAcknowledged()
     }
 
     override suspend fun updatePost(post: Post): Boolean {
         return postCollection
             .updateOne(
-                Post::id eq post.id,
+                Filters.eq(Post::_id.name, post._id),
                 mutableListOf(
-                    setValue(Post::title, post.title),
-                    setValue(Post::subtitle, post.subtitle),
-                    setValue(Post::category, post.category),
-                    setValue(Post::thumbnail, post.thumbnail),
-                    setValue(Post::content, post.content),
-                    setValue(Post::main, post.main),
-                    setValue(Post::popular, post.popular),
-                    setValue(Post::sponsored, post.sponsored),
+                    Updates.set(Post::title.name, post.title),
+                    Updates.set(Post::subtitle.name, post.subtitle),
+                    Updates.set(Post::category.name, post.category),
+                    Updates.set(Post::thumbnail.name, post.thumbnail),
+                    Updates.set(Post::content.name, post.content),
+                    Updates.set(Post::main.name, post.main),
+                    Updates.set(Post::popular.name, post.popular),
+                    Updates.set(Post::sponsored.name, post.sponsored),
                 )
             )
-            .awaitLast()
             .wasAcknowledged()
     }
 
     override suspend fun readMyPosts(skip: Int, author: String): List<SimplePost> {
         return postCollection.withDocumentClass(SimplePost::class.java)
-            .find(SimplePost::author eq author)
-            .sort(descending(SimplePost::date))
+            .find(Filters.eq(SimplePost::author.name, author))
+            .sort(descending(SimplePost::date.name))
             .skip(skip)
             .limit(POSTS_PER_PAGE)
             .toList()
@@ -73,13 +70,13 @@ class MongoDB(private val context: InitApiContext, connectionString: String) : M
     override suspend fun readLatestPosts(skip: Int): List<SimplePost> {
         return postCollection.withDocumentClass(SimplePost::class.java)
             .find(
-                and(
-                    SimplePost::popular eq false,
-                    SimplePost::main eq false,
-                    SimplePost::sponsored eq false,
+                Filters.and(
+                    Filters.eq(SimplePost::main.name, false),
+                    Filters.eq(SimplePost::popular.name, false),
+                    Filters.eq(SimplePost::sponsored.name, false),
                 )
             )
-            .sort(descending(SimplePost::date))
+            .sort(descending(SimplePost::date.name))
             .skip(skip)
             .limit(POSTS_PER_PAGE)
             .toList()
@@ -87,16 +84,16 @@ class MongoDB(private val context: InitApiContext, connectionString: String) : M
 
     override suspend fun readSponsoredPosts(): List<SimplePost> {
         return postCollection.withDocumentClass(SimplePost::class.java)
-            .find(SimplePost::sponsored eq true)
-            .sort(descending(SimplePost::date))
+            .find(Filters.eq(SimplePost::sponsored.name, true))
+            .sort(descending(SimplePost::date.name))
             .limit(2)
             .toList()
     }
 
     override suspend fun readPopularPosts(skip: Int): List<SimplePost> {
         return postCollection.withDocumentClass(SimplePost::class.java)
-            .find(SimplePost::popular eq true)
-            .sort(descending(SimplePost::date))
+            .find(Filters.eq(SimplePost::popular.name, true))
+            .sort(descending(SimplePost::date.name))
             .skip(skip)
             .limit(POSTS_PER_PAGE)
             .toList()
@@ -104,8 +101,8 @@ class MongoDB(private val context: InitApiContext, connectionString: String) : M
 
     override suspend fun readMainPosts(): List<SimplePost> {
         return postCollection.withDocumentClass(SimplePost::class.java)
-            .find(SimplePost::main eq true)
-            .sort(descending(SimplePost::date))
+            .find(Filters.eq(SimplePost::main.name, true))
+            .sort(descending(SimplePost::date.name))
             .limit(MAIN_POSTS_LIMIT)
             .toList()
     }
@@ -113,8 +110,8 @@ class MongoDB(private val context: InitApiContext, connectionString: String) : M
     override suspend fun searchPostsByTitle(query: String, skip: Int): List<SimplePost> {
         val regexQuery = query.toRegex(RegexOption.IGNORE_CASE)
         return postCollection.withDocumentClass(SimplePost::class.java)
-            .find(SimplePost::title regex regexQuery)
-            .sort(descending(SimplePost::date))
+            .find(Filters.regex(SimplePost::title.name, regexQuery.pattern))
+            .sort(descending(SimplePost::date.name))
             .skip(skip)
             .limit(POSTS_PER_PAGE)
             .toList()
@@ -122,20 +119,19 @@ class MongoDB(private val context: InitApiContext, connectionString: String) : M
 
     override suspend fun searchPostsByCategory(category: Category, skip: Int): List<SimplePost> {
         return postCollection.withDocumentClass(SimplePost::class.java)
-            .find(SimplePost::category eq category)
-            .sort(descending(SimplePost::date))
+            .find(Filters.eq(SimplePost::category.name, category))
+            .sort(descending(SimplePost::date.name))
             .skip(skip)
             .limit(POSTS_PER_PAGE)
             .toList()
     }
 
     override suspend fun readSelectedPost(id: String): Post {
-        return postCollection.find(Post::id eq id).toList().first()
+        return postCollection.find(Filters.eq(Post::_id.name, id)).toList().first()
     }
 
     override suspend fun deleteSelectedPosts(ids: List<String>): Boolean {
-        return postCollection.deleteMany(Post::id `in` ids)
-            .awaitLast()
+        return postCollection.deleteMany(Filters.`in`(Post::_id.name, ids))
             .wasAcknowledged()
     }
 
@@ -143,11 +139,11 @@ class MongoDB(private val context: InitApiContext, connectionString: String) : M
         return try {
             userCollection
                 .find(
-                    and(
-                        User::username eq user.username,
-                        User::password eq user.password,
+                    Filters.and(
+                        Filters.eq(User::username.name, user.username),
+                        Filters.eq(User::password.name, user.password),
                     )
-                ).awaitFirst()
+                ).firstOrNull()
         } catch (e: Exception) {
             context.logger.error(e.message.toString())
             null
@@ -156,7 +152,7 @@ class MongoDB(private val context: InitApiContext, connectionString: String) : M
 
     override suspend fun checkUserId(id: String): Boolean {
         return try {
-            val documentCount = userCollection.countDocuments(User::id eq id).awaitFirst()
+            val documentCount = userCollection.countDocuments(Filters.eq(User::_id.name, id))
             documentCount > 0
         } catch (e: Exception) {
             context.logger.error(e.message.toString())
@@ -166,14 +162,13 @@ class MongoDB(private val context: InitApiContext, connectionString: String) : M
 
     override suspend fun subscribe(newsletter: Newsletter): String {
         val result = newsletterCollection
-            .find(Newsletter::email eq newsletter.email)
+            .find(Filters.eq(Newsletter::email.name, newsletter.email))
             .toList()
 
         return if (result.isNotEmpty()) {
             "You're already subscribed"
         } else {
             val newEmail = newsletterCollection.insertOne(newsletter)
-                .awaitFirst()
                 .wasAcknowledged()
 
             if (newEmail) {

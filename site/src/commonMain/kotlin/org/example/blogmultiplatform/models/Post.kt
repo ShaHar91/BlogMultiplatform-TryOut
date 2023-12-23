@@ -1,13 +1,11 @@
 package org.example.blogmultiplatform.models
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
 @Serializable
 data class Post(
-    @SerialName("_id")
-    val id: String = "",
+    val _id: String = "",
     val author: String = "",
     val date: Double = 0.0,
     val title: String,
@@ -22,8 +20,7 @@ data class Post(
 
 @Serializable
 data class SimplePost(
-    @SerialName("_id")
-    val id: String = "",
+    val _id: String = "",
     val author: String,
     val date: Double,
     val title: String,

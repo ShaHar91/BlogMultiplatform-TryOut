@@ -209,7 +209,7 @@ fun MyPostsScreen() {
                                     selectableMode = false
                                     switchText = "Select"
                                     postsToSkip -= selectedPosts.size
-                                    myPosts.removeAll { selectedPosts.contains(it.id) }
+                                    myPosts.removeAll { selectedPosts.contains(it._id) }
                                     selectedPosts.clear()
                                 }
                             }

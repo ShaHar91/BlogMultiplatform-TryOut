@@ -8,6 +8,7 @@ import com.varabyte.kobweb.api.http.Response
 import com.varabyte.kobweb.api.http.setBodyText
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.bson.codecs.ObjectIdGenerator
 import org.example.blogmultiplatform.data.MongoDB
 import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.ApiResponse
@@ -19,13 +20,12 @@ import org.example.blogmultiplatform.utils.CommonConstants.CATEGORY_PARAM
 import org.example.blogmultiplatform.utils.CommonConstants.POST_ID_PARAM
 import org.example.blogmultiplatform.utils.CommonConstants.QUERY_PARAM
 import org.example.blogmultiplatform.utils.CommonConstants.SKIP_PARAM
-import org.litote.kmongo.id.ObjectIdGenerator
 
 @Api("addpost")
 suspend fun addPost(context: ApiContext) {
     try {
         val post = context.req.getBody<Post>()
-        val newPost = post?.copy(id = ObjectIdGenerator.newObjectId<String>().id.toHexString())
+        val newPost = post?.copy(_id = ObjectIdGenerator().generate().toString())
         context.res.setBodyText(
             newPost?.let {
                 context.data.getValue<MongoDB>().addPost(it).toString()

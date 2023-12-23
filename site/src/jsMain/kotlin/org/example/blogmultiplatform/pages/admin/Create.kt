@@ -165,7 +165,7 @@ fun CreateScreen() {
             if (response is ApiResponse.Success) {
                 (document.getElementById(Id.contentInput) as HTMLTextAreaElement).value = response.data.content
                 uiState = uiState.copy(
-                    id = response.data.id,
+                    id = response.data._id,
                     title = response.data.title,
                     subtitle = response.data.subtitle,
                     content = response.data.content,
@@ -386,7 +386,7 @@ fun CreateScreen() {
                             )
 
                             if (hasPostIdParam) {
-                                val result = updatePost(post.copy(id = uiState.id))
+                                val result = updatePost(post.copy(_id = uiState.id))
 
                                 if (result) {
                                     context.router.navigateTo(Screen.AdminSuccess.postUpdated())

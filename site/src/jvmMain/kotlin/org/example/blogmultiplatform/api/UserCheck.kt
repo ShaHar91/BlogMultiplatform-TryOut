@@ -3,10 +3,6 @@ package org.example.blogmultiplatform.api
 import com.varabyte.kobweb.api.Api
 import com.varabyte.kobweb.api.ApiContext
 import com.varabyte.kobweb.api.data.getValue
-import com.varabyte.kobweb.api.http.setBodyText
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.example.blogmultiplatform.data.MongoDB
 import org.example.blogmultiplatform.models.User
 import org.example.blogmultiplatform.models.UserWithoutPassword
@@ -22,7 +18,7 @@ suspend fun userCheck(context: ApiContext) {
         val user = userRequest?.let { context.data.getValue<MongoDB>().checkUserExistence(User(username = it.username, password = hashPassword(it.password))) }
 
         if (user != null) {
-            context.res.setBody<UserWithoutPassword>(UserWithoutPassword(id = user.id, username = user.username))
+            context.res.setBody<UserWithoutPassword>(UserWithoutPassword(_id = user._id, username = user.username))
         } else {
             context.res.setBody(Exception("User doesn't exist"))
         }
