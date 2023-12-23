@@ -7,11 +7,7 @@ import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
-import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
-import com.varabyte.kobweb.compose.ui.modifiers.margin
-import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
-import com.varabyte.kobweb.compose.ui.modifiers.width
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import org.example.blogmultiplatform.components.PostPreview
 import org.example.blogmultiplatform.models.ApiListResponse
@@ -77,6 +73,7 @@ fun MainPosts(
             ) {
                 posts.drop(1).forEach {
                     PostPreview(
+                        modifier = Modifier.margin(bottom = 20.px),
                         post = it,
                         darkTheme = true,
                         vertical = false,

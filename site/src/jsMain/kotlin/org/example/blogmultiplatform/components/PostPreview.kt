@@ -42,6 +42,7 @@ import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.text.SpanText
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.models.Theme
+import org.example.blogmultiplatform.styles.MainPostPreviewStyle
 import org.example.blogmultiplatform.styles.PostPreviewStyle
 import org.example.blogmultiplatform.utils.Constants.FONT_FAMILY
 import org.example.blogmultiplatform.utils.maxLines
@@ -72,7 +73,13 @@ fun PostPreview(
 
     if (vertical) {
         Column(
-            modifier = PostPreviewStyle.toModifier()
+            modifier = Modifier
+                .thenIf(post.main){
+                    MainPostPreviewStyle.toModifier()
+                }
+                .thenIf(!post.main){
+                    PostPreviewStyle.toModifier()
+                }
                 .then(modifier)
                 .fillMaxWidth(if (darkTheme || titleColor == Theme.Sponsored.rgb) 100.percent else 95.percent)
                 .margin(bottom = 24.px)
@@ -107,8 +114,15 @@ fun PostPreview(
         }
     } else {
         Row(
-            modifier = PostPreviewStyle.toModifier()
+            modifier = Modifier
+                .thenIf(post.main){
+                    MainPostPreviewStyle.toModifier()
+                }
+                .thenIf(!post.main){
+                    PostPreviewStyle.toModifier()
+                }
                 .then(modifier)
+                .height(thumbnailHeight)
                 .cursor(Cursor.Pointer)
                 .onClick {
                     onClick(post.id)
@@ -152,6 +166,7 @@ fun PostContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(12.px)
             .thenIf(!vertical) {
                 Modifier.margin(left = 20.px)
             }
