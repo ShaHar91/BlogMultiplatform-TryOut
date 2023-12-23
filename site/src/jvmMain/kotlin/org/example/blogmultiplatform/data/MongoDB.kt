@@ -5,36 +5,34 @@ import com.varabyte.kobweb.api.init.InitApi
 import com.varabyte.kobweb.api.init.InitApiContext
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitLast
-import org.example.blogmultiplatform.models.Category
-import org.example.blogmultiplatform.models.Newsletter
-import org.example.blogmultiplatform.models.Post
-import org.example.blogmultiplatform.models.SimplePost
-import org.example.blogmultiplatform.models.User
+import org.example.blogmultiplatform.models.*
 import org.example.blogmultiplatform.utils.CommonConstants.POSTS_PER_PAGE
 import org.example.blogmultiplatform.utils.Constants.DATABASE_NAME
 import org.example.blogmultiplatform.utils.Constants.MAIN_POSTS_LIMIT
-import org.litote.kmongo.and
+import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.toList
-import org.litote.kmongo.descending
-import org.litote.kmongo.eq
-import org.litote.kmongo.`in`
 import org.litote.kmongo.reactivestreams.KMongo
 import org.litote.kmongo.reactivestreams.getCollection
-import org.litote.kmongo.regex
-import org.litote.kmongo.setValue
 
 @InitApi
 fun initMongoDB(context: InitApiContext) {
     println("Whatever this is!!! \n${System.getenv()}")
 
-    System.setProperty("org.litote.mongo.test.mapping.service", "org.litote.kmongo.serialization.SerializationClassMappingTypeService")
-    context.data.add(MongoDB(context))
+    System.setProperty(
+        "org.litote.mongo.test.mapping.service",
+        "org.litote.kmongo.serialization.SerializationClassMappingTypeService"
+    )
+    System.getenv().forEach { (key, value) ->
+        if (key == "MONGODB_URI") {
+            context.data.add(MongoDB(context, connectionString = value))
+        }
+    }
 }
 
-class MongoDB(private val context: InitApiContext) : MongoRepository {
+class MongoDB(private val context: InitApiContext, private val connectionString: String) : MongoRepository {
 
     //    private val client = KMongo.createClient()
-    private val client = KMongo.createClient(System.getenv("MONGODB_URI") ?: "")
+    private val client = KMongo.createClient(connectionString)
     private val database = client.getDatabase(DATABASE_NAME)
     private val userCollection = database.getCollection<User>()
     private val postCollection = database.getCollection<Post>()
