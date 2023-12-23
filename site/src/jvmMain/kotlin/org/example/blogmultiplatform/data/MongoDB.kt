@@ -20,15 +20,24 @@ fun initMongoDB(context: InitApiContext) {
         "org.litote.mongo.test.mapping.service",
         "org.litote.kmongo.serialization.SerializationClassMappingTypeService"
     )
+
+    // Do this for pushing to the remote
     System.getenv().forEach { (key, value) ->
         if (key == "MONGODB_URI") {
             context.data.add(MongoDB(context, connectionString = value))
         }
     }
+
+//    // Do this for local things
+//    context.data.add(MongoDB(context, ""))
 }
 
 class MongoDB(private val context: InitApiContext, connectionString: String) : MongoRepository {
 
+    // Do this for local things
+//    private val client = MongoClient.create()
+
+    // Do this for pushing to the remote
     private val client = MongoClient.create(connectionString)
 
     private val database = client.getDatabase(DATABASE_NAME)
