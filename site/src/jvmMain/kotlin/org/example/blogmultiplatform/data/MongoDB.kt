@@ -29,7 +29,7 @@ fun initMongoDB(context: InitApiContext) {
     }
 }
 
-class MongoDB(private val context: InitApiContext, private val connectionString: String) : MongoRepository {
+class MongoDB(private val context: InitApiContext, connectionString: String) : MongoRepository {
 
     //    private val client = KMongo.createClient()
     private val client = KMongo.createClient(connectionString)
