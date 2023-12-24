@@ -1,48 +1,18 @@
 package org.example.blogmultiplatform.components
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.css.ScrollBehavior
-import com.varabyte.kobweb.compose.dom.svg.Path
-import com.varabyte.kobweb.compose.dom.svg.SVGFillType
-import com.varabyte.kobweb.compose.dom.svg.SVGStrokeLineCap
-import com.varabyte.kobweb.compose.dom.svg.SVGStrokeLineJoin
-import com.varabyte.kobweb.compose.dom.svg.Svg
+import com.varabyte.kobweb.compose.dom.svg.*
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
-import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
-import com.varabyte.kobweb.compose.ui.modifiers.color
-import com.varabyte.kobweb.compose.ui.modifiers.cursor
-import com.varabyte.kobweb.compose.ui.modifiers.fillMaxHeight
-import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
-import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
-import com.varabyte.kobweb.compose.ui.modifiers.fontSize
-import com.varabyte.kobweb.compose.ui.modifiers.height
-import com.varabyte.kobweb.compose.ui.modifiers.id
-import com.varabyte.kobweb.compose.ui.modifiers.margin
-import com.varabyte.kobweb.compose.ui.modifiers.onClick
-import com.varabyte.kobweb.compose.ui.modifiers.opacity
-import com.varabyte.kobweb.compose.ui.modifiers.overflow
-import com.varabyte.kobweb.compose.ui.modifiers.padding
-import com.varabyte.kobweb.compose.ui.modifiers.position
-import com.varabyte.kobweb.compose.ui.modifiers.scrollBehavior
-import com.varabyte.kobweb.compose.ui.modifiers.transition
-import com.varabyte.kobweb.compose.ui.modifiers.translateX
-import com.varabyte.kobweb.compose.ui.modifiers.width
-import com.varabyte.kobweb.compose.ui.modifiers.zIndex
-import com.varabyte.kobweb.compose.ui.styleModifier
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.rememberPageContext
@@ -65,11 +35,7 @@ import org.example.blogmultiplatform.utils.Constants.SIDE_PANEL_WIDTH
 import org.example.blogmultiplatform.utils.Id
 import org.example.blogmultiplatform.utils.Res
 import org.example.blogmultiplatform.utils.logout
-import org.jetbrains.compose.web.css.Position
-import org.jetbrains.compose.web.css.ms
-import org.jetbrains.compose.web.css.percent
-import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.css.vh
+import org.jetbrains.compose.web.css.*
 
 @Composable
 fun SidePanel(onMenuClick: () -> Unit) {
@@ -198,21 +164,18 @@ private fun VectorIcon(
             }
     ) {
 
-        Path(
-            attrs = Modifier
-                .id(Id.vectorIcon)
-                .thenIf(selected) {
-                    Modifier.styleModifier {
-                        property("stroke", Theme.Primary.hex)
-                    }
-                }
-                .toAttrs {
-                    d(pathData)
-                    strokeWidth(2)
-                    strokeLineCap(SVGStrokeLineCap.Round)
-                    strokeLineJoin(SVGStrokeLineJoin.Round)
-                }
-        )
+        Path {
+            if (selected) {
+                // Needs to be like this because there is a style on the parent that changes the color
+                attr(attr = "style", value = "stroke: ${Theme.Primary.hex}")
+            }
+
+            id(Id.vectorIcon)
+            d(pathData)
+            strokeWidth(2)
+            strokeLineCap(SVGStrokeLineCap.Round)
+            strokeLineJoin(SVGStrokeLineJoin.Round)
+        }
     }
 }
 
