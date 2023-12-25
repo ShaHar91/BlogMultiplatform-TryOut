@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.christiano.androidapp.models.Category
+import org.example.blogmultiplatform.Category
 import com.christiano.androidapp.navigation.Screen
 import com.christiano.androidapp.screens.home.HomeScreen
 import com.christiano.androidapp.screens.home.HomeViewModel

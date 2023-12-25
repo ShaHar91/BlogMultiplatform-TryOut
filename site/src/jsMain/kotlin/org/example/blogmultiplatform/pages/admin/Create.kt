@@ -68,7 +68,6 @@ import org.example.blogmultiplatform.components.AdminPageLayout
 import org.example.blogmultiplatform.components.ControlPopup
 import org.example.blogmultiplatform.components.MessagePopup
 import org.example.blogmultiplatform.models.ApiResponse
-import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.ControlStyle
 import org.example.blogmultiplatform.models.EditorControl
 import org.example.blogmultiplatform.models.Post
@@ -100,6 +99,7 @@ import org.jetbrains.compose.web.dom.Ul
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLTextAreaElement
 import kotlin.js.Date
+import org.example.blogmultiplatform.Category
 
 data class CreatePageUiState(
     val id: String = "",

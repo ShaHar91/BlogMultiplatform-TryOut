@@ -1,6 +1,7 @@
 package org.example.blogmultiplatform.models
 
 import kotlinx.serialization.Serializable
+import org.example.blogmultiplatform.Category
 
 
 @Serializable

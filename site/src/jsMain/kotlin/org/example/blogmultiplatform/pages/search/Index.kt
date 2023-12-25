@@ -28,7 +28,6 @@ import org.example.blogmultiplatform.components.CategoryNavigationItems
 import org.example.blogmultiplatform.components.LoadingIndicator
 import org.example.blogmultiplatform.components.OverflowSidePanel
 import org.example.blogmultiplatform.models.ApiListResponse
-import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.SimplePost
 import org.example.blogmultiplatform.navigation.Screen
 import org.example.blogmultiplatform.sections.FooterSection
@@ -43,6 +42,8 @@ import org.example.blogmultiplatform.utils.searchPostsByCategory
 import org.example.blogmultiplatform.utils.searchPostsByTitle
 import org.jetbrains.compose.web.css.px
 import org.w3c.dom.HTMLInputElement
+import org.example.blogmultiplatform.Category
+import org.example.blogmultiplatform.parseCategoryName
 
 @Page("query")
 @Composable
@@ -80,7 +81,7 @@ fun SearchPage() {
             (document.getElementById(Id.adminSearchBar) as HTMLInputElement).value = ""
 
             searchPostsByCategory(
-                category = Category.parseName(value),
+                category = value.parseCategoryName(),
                 skip = postsToSkip,
                 onSuccess = { response ->
                     apiResponse = response
@@ -126,7 +127,7 @@ fun SearchPage() {
                 onMenuClose = { overflowOpened = false },
                 content = {
                     CategoryNavigationItems(
-                        selectedCategory = if (hasCategoryParam) Category.parseName(value) else null,
+                        selectedCategory = if (hasCategoryParam) value.parseCategoryName() else null,
                         vertical = true
                     )
                 }
@@ -135,7 +136,7 @@ fun SearchPage() {
 
         HeaderSection(
             breakpoint = breakpoint,
-            selectedCategory = if (hasCategoryParam) Category.parseName(value) else null,
+            selectedCategory = if (hasCategoryParam) value.parseCategoryName() else null,
             onMenuOpen = { overflowOpened = true }
         )
 
@@ -149,7 +150,7 @@ fun SearchPage() {
                         .fontSize(36.px)
                         .fillMaxWidth()
                         .textAlign(TextAlign.Center),
-                    text = Category.parseName(value).name
+                    text = value.parseCategoryName().name
                 )
             }
 
@@ -161,7 +162,7 @@ fun SearchPage() {
                     scope.launch {
                         if (hasCategoryParam) {
                             searchPostsByCategory(
-                                category = Category.parseName(value),
+                                category = value.parseCategoryName(),
                                 skip = postsToSkip,
                                 onSuccess = { response ->
                                     if (response is ApiListResponse.Success) {

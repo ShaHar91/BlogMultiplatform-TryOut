@@ -1,6 +1,6 @@
 package com.christiano.androidapp.data
 
-import com.christiano.androidapp.models.Category
+import org.example.blogmultiplatform.Category
 import com.christiano.androidapp.models.Post
 import com.christiano.androidapp.util.Constants.APP_ID
 import com.christiano.androidapp.util.RequestState

@@ -6,6 +6,7 @@ import android.util.Base64
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.Serializable
+import org.example.blogmultiplatform.Category
 
 @Serializable
 open class Post : RealmObject {

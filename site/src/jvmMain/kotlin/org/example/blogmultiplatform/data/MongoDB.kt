@@ -13,6 +13,7 @@ import org.example.blogmultiplatform.models.*
 import org.example.blogmultiplatform.utils.CommonConstants.POSTS_PER_PAGE
 import org.example.blogmultiplatform.utils.Constants.DATABASE_NAME
 import org.example.blogmultiplatform.utils.Constants.MAIN_POSTS_LIMIT
+import org.example.blogmultiplatform.Category
 
 @InitApi
 fun initMongoDB(context: InitApiContext) {
@@ -22,23 +23,23 @@ fun initMongoDB(context: InitApiContext) {
     )
 
     // Do this for pushing to the remote
-    System.getenv().forEach { (key, value) ->
-        if (key == "MONGODB_URI") {
-            context.data.add(MongoDB(context, connectionString = value))
-        }
-    }
+//    System.getenv().forEach { (key, value) ->
+//        if (key == "MONGODB_URI") {
+//            context.data.add(MongoDB(context, connectionString = value))
+//        }
+//    }
 
 //    // Do this for local things
-//    context.data.add(MongoDB(context, ""))
+    context.data.add(MongoDB(context, ""))
 }
 
 class MongoDB(private val context: InitApiContext, connectionString: String) : MongoRepository {
 
     // Do this for local things
-//    private val client = MongoClient.create()
+    private val client = MongoClient.create()
 
     // Do this for pushing to the remote
-    private val client = MongoClient.create(connectionString)
+//    private val client = MongoClient.create(connectionString)
 
     private val database = client.getDatabase(DATABASE_NAME)
     private val userCollection = database.getCollection<User>("user")

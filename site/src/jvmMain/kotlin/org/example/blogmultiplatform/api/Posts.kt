@@ -12,7 +12,6 @@ import org.bson.codecs.ObjectIdGenerator
 import org.example.blogmultiplatform.data.MongoDB
 import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.ApiResponse
-import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.utils.CommonConstants
 import org.example.blogmultiplatform.utils.CommonConstants.AUTHOR_PARAM
@@ -20,6 +19,7 @@ import org.example.blogmultiplatform.utils.CommonConstants.CATEGORY_PARAM
 import org.example.blogmultiplatform.utils.CommonConstants.POST_ID_PARAM
 import org.example.blogmultiplatform.utils.CommonConstants.QUERY_PARAM
 import org.example.blogmultiplatform.utils.CommonConstants.SKIP_PARAM
+import org.example.blogmultiplatform.Category
 
 @Api("addpost")
 suspend fun addPost(context: ApiContext) {

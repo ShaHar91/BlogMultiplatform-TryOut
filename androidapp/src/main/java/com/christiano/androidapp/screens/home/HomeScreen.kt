@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.christiano.androidapp.components.NavigationDrawer
 import com.christiano.androidapp.components.PostCardsView
-import com.christiano.androidapp.models.Category
+import org.example.blogmultiplatform.Category
 import com.christiano.androidapp.models.Post
 import com.christiano.androidapp.ui.theme.BlogMultiplatformTheme
 import com.christiano.androidapp.util.RequestState

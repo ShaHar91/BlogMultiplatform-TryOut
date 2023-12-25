@@ -2,7 +2,7 @@ package com.christiano.androidapp.navigation
 
 import com.christiano.androidapp.util.Constants.CATEGORY_ARGUMENT
 import com.christiano.androidapp.util.Constants.POST_ID_ARGUMENT
-import com.christiano.androidapp.models.Category as PostCategory
+import org.example.blogmultiplatform.Category as PostCategory
 
 sealed class Screen(val route: String) {
     data object Home : Screen("home_screen")

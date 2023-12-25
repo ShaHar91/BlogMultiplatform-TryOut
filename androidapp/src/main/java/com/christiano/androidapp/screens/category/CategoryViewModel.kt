@@ -7,11 +7,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.christiano.androidapp.data.MongoSync
-import com.christiano.androidapp.models.Category
+import org.example.blogmultiplatform.Category
 import com.christiano.androidapp.models.Post
 import com.christiano.androidapp.util.RequestState
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.example.blogmultiplatform.parseCategoryName
 
 class CategoryViewModel(
     savedStateHandle: SavedStateHandle
@@ -24,7 +25,7 @@ class CategoryViewModel(
         val selectedCategory = savedStateHandle.get<String>("category")
         if (selectedCategory != null) {
             viewModelScope.launch {
-                MongoSync.searchPostsByCategory(Category.parseName(selectedCategory))
+                MongoSync.searchPostsByCategory(selectedCategory.parseCategoryName())
                     .collectLatest { _categoryPosts.value = it }
             }
         }

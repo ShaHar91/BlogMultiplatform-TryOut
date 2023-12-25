@@ -26,11 +26,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.christiano.androidapp.models.Category
+import org.example.blogmultiplatform.Category
 import com.christiano.androidapp.models.Post
 import com.christiano.androidapp.ui.theme.BlogMultiplatformTheme
 import com.christiano.androidapp.util.RequestState
 import com.christiano.androidapp.util.convertLongToDate
+import org.example.blogmultiplatform.parseCategoryName
 
 @Composable
 fun PostCard(
@@ -100,7 +101,7 @@ fun PostCard(
                 SuggestionChip(
                     onClick = { /*TODO*/ },
                     label = {
-                        Text(Category.parseName(post.category).name)
+                        Text(post.category.parseCategoryName().name)
                     }
                 )
             }

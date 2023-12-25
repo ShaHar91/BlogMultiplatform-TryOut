@@ -8,7 +8,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.ApiResponse
-import org.example.blogmultiplatform.models.Category
 import org.example.blogmultiplatform.models.Newsletter
 import org.example.blogmultiplatform.models.Post
 import org.example.blogmultiplatform.models.RandomJoke
@@ -22,6 +21,7 @@ import org.example.blogmultiplatform.utils.CommonConstants.SKIP_PARAM
 import org.w3c.dom.get
 import org.w3c.dom.set
 import kotlin.js.Date
+import org.example.blogmultiplatform.Category
 
 suspend fun checkUserExistence(user: User): UserWithoutPassword? {
     return try {

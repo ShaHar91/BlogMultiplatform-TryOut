@@ -5,11 +5,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.christiano.androidapp.models.Category
+import org.example.blogmultiplatform.Category
 import com.christiano.androidapp.navigation.Screen
 import com.christiano.androidapp.screens.category.CategoryScreen
 import com.christiano.androidapp.screens.category.CategoryViewModel
 import com.christiano.androidapp.util.Constants.CATEGORY_ARGUMENT
+import org.example.blogmultiplatform.parseCategoryName
 
 fun NavGraphBuilder.categoryRoute(
     onBackPress: () -> Unit,
@@ -26,7 +27,7 @@ fun NavGraphBuilder.categoryRoute(
 
         CategoryScreen(
             posts = viewModel.categoryPosts.value,
-            category = Category.parseName(selectedCategory),
+            category = selectedCategory.parseCategoryName(),
             onBackPress = onBackPress,
             onPostClick = onPostClick
         )
