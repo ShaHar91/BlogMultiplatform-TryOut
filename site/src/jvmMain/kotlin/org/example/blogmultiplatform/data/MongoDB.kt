@@ -22,15 +22,15 @@ fun initMongoDB(context: InitApiContext) {
         "org.litote.kmongo.serialization.SerializationClassMappingTypeService"
     )
 
-    // Do this for pushing to the remote
-//    System.getenv().forEach { (key, value) ->
-//        if (key == "MONGODB_URI") {
-//            context.data.add(MongoDB(context, connectionString = value))
-//        }
-//    }
+//     Do this for pushing to the remote
+    System.getenv().forEach { (key, value) ->
+        if (key == "MONGODB_URI") {
+            context.data.add(MongoDB(context, connectionString = value))
+        }
+    }
 
 //    // Do this for local things
-    context.data.add(MongoDB(context, ""))
+//    context.data.add(MongoDB(context, ""))
 }
 
 class MongoDB(private val context: InitApiContext, connectionString: String) : MongoRepository {
