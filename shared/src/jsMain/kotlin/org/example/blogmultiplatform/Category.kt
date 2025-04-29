@@ -6,7 +6,7 @@ import com.varabyte.kobweb.compose.ui.graphics.Color.Companion.rgba
 import kotlinx.serialization.Serializable
 
 @Serializable
-actual enum class Category(override val color: String) : CategoryColor {
+actual enum class Category(val color: String) {
     Technology(color = Theme.Green.hex),
     Programming(color = Theme.Yellow.hex),
     Design(color = Theme.Purple.hex)

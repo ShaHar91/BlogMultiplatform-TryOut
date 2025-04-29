@@ -21,7 +21,7 @@ fun NavGraphBuilder.detailsRoute(
     ) {
         val postId = it.arguments?.getString(POST_ID_ARGUMENT)
         DetailsScreen(
-            url = "http://10.0.2.2:8080/posts/post?$POST_ID_ARGUMENT=$postId&showSections=false",
+            url = "http://10.0.2.2:8081/posts/post?$POST_ID_ARGUMENT=$postId&showSections=false",
             onBackPress = onBackPress
         )
     }

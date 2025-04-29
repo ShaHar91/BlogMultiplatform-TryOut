@@ -4,7 +4,8 @@ import kotlinx.html.script
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.jetbrains.compose)
+//    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kobweb.application)
     alias(libs.plugins.serialization.plugin)
     // alias(libs.plugins.kobwebx.markdown)
@@ -46,7 +47,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
+                implementation(libs.compose.runtime)
                 implementation(libs.kotlinx.serialization)
                 implementation(project(":shared"))
             }
@@ -54,7 +55,8 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
-                implementation(compose.html.core)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.html.core)
                 implementation(libs.kobweb.core)
                 implementation(libs.kobweb.silk.core)
                 implementation(libs.kobweb.silk.icons.fa)

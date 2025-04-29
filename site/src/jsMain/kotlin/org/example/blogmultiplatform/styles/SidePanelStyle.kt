@@ -1,20 +1,20 @@
 package org.example.blogmultiplatform.styles
 
-import com.varabyte.kobweb.compose.css.CSSTransition
+import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.TransitionProperty
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.styleModifier
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.style.CssStyle
 import org.example.blogmultiplatform.models.Theme
 import org.example.blogmultiplatform.utils.Id
 import org.jetbrains.compose.web.css.ms
 
-val NavigationItemStyle by ComponentStyle {
+val NavigationItemStyle = CssStyle {
     cssRule(" > #${Id.svgParent} > #${Id.vectorIcon}") {
         Modifier
-            .transition(CSSTransition(property = TransitionProperty.All, duration = 300.ms))
+            .transition(Transition.of(property = TransitionProperty.All, duration = 300.ms))
             .styleModifier {
                 property("stroke", Theme.White.rgb)
             }
@@ -29,7 +29,7 @@ val NavigationItemStyle by ComponentStyle {
 
     cssRule(" > #${Id.navigationText}") {
         Modifier
-            .transition(CSSTransition(property = TransitionProperty.All, duration = 300.ms))
+            .transition(Transition.of(property = TransitionProperty.All, duration = 300.ms))
             .color(Theme.White.rgb)
     }
 

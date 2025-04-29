@@ -1,20 +1,20 @@
 package org.example.blogmultiplatform.styles
 
-import com.varabyte.kobweb.compose.css.CSSTransition
+import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.TransitionProperty
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.outline
 import com.varabyte.kobweb.compose.ui.modifiers.transition
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.focus
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.selectors.focus
 import org.example.blogmultiplatform.models.Theme
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.px
 
-val NewsletterInputStyle by ComponentStyle {
+val NewsletterInputStyle = CssStyle {
     base {
         Modifier
             .outline(
@@ -27,7 +27,7 @@ val NewsletterInputStyle by ComponentStyle {
                 style = LineStyle.Solid,
                 color = Colors.Transparent
             )
-            .transition(CSSTransition(TransitionProperty.All, 300.ms))
+            .transition(Transition.of(TransitionProperty.All, 300.ms))
     }
 
     focus {

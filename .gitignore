@@ -64,3 +64,4 @@ signing.gradle
 
 #zodat Bitrise CI dirty kan managen fix for detached header
 Vendor
+.kotlin/*

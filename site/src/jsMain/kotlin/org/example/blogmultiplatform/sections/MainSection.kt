@@ -8,7 +8,7 @@ import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import org.example.blogmultiplatform.components.PostPreview
 import org.example.blogmultiplatform.models.ApiListResponse
 import org.example.blogmultiplatform.models.SimplePost

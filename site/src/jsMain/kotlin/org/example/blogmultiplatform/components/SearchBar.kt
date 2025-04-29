@@ -6,8 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.css.Cursor
+import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.TransitionProperty
 import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
@@ -33,7 +33,7 @@ import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaMagnifyingGlass
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
-import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import org.example.blogmultiplatform.models.Theme
 import org.example.blogmultiplatform.utils.Id
 import org.example.blogmultiplatform.utils.noBorder
@@ -75,20 +75,20 @@ fun SearchBar(
                     width = 2.px,
                     style = LineStyle.Solid,
                     color =
-                    if (focused) {
-                        Theme.Primary.rgb
-                    } else {
-                        if (!darkTheme) Theme.LightGrey.rgb else Theme.Secondary.rgb
-                    }
+                        if (focused) {
+                            Theme.Primary.rgb
+                        } else {
+                            if (!darkTheme) Theme.LightGrey.rgb else Theme.Secondary.rgb
+                        }
                 )
-                .transition(CSSTransition(property = TransitionProperty.All, duration = 200.ms)),
+                .transition(Transition.of(property = TransitionProperty.All, duration = 200.ms)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             FaMagnifyingGlass(
                 modifier = Modifier
                     .color(if (focused) Theme.Primary.rgb else Theme.DarkGrey.rgb)
                     .margin(right = 14.px)
-                    .transition(CSSTransition(property = "color", duration = 200.ms)),
+                    .transition(Transition.of(property = "color", duration = 200.ms)),
                 size = IconSize.SM
             )
 

@@ -1,7 +1,7 @@
 package org.example.blogmultiplatform.utils
 
 import com.varabyte.kobweb.browser.api
-import com.varabyte.kobweb.compose.http.http
+import com.varabyte.kobweb.browser.http.http
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import kotlinx.serialization.encodeToString
