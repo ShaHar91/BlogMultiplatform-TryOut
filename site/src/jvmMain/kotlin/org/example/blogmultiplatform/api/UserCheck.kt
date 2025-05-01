@@ -3,6 +3,7 @@ package org.example.blogmultiplatform.api
 import com.varabyte.kobweb.api.Api
 import com.varabyte.kobweb.api.ApiContext
 import com.varabyte.kobweb.api.data.getValue
+import com.varabyte.kobweb.api.http.setBodyText
 import org.example.blogmultiplatform.data.MongoDB
 import org.example.blogmultiplatform.models.User
 import org.example.blogmultiplatform.models.UserWithoutPassword
@@ -20,10 +21,10 @@ suspend fun userCheck(context: ApiContext) {
         if (user != null) {
             context.res.setBody<UserWithoutPassword>(UserWithoutPassword(_id = user._id, username = user.username))
         } else {
-            context.res.setBody(Exception("User doesn't exist"))
+            context.res.setBodyText(Exception("User doesn't exist").message.toString())
         }
     } catch (e: Exception) {
-        context.res.setBody(e)
+        context.res.setBodyText(e.message.toString())
     }
 }
 

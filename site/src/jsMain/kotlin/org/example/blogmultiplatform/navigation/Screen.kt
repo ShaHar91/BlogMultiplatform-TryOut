@@ -12,8 +12,8 @@ sealed class Screen(val route: String) {
         fun passPostId(id: String) = "/admin/create?$POST_ID_PARAM=$id"
     }
 
-    data object AdminMyPosts : Screen(route = "/admin/myposts") {
-        fun searchByTitle(query: String) = "/admin/myposts?$QUERY_PARAM=$query"
+    data object AdminMyPosts : Screen(route = "/admin/my-posts") {
+        fun searchByTitle(query: String) = "/admin/my-posts?$QUERY_PARAM=$query"
     }
 
     data object AdminSuccess : Screen(route = "/admin/success") {

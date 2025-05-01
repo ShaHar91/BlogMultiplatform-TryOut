@@ -10,6 +10,7 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.core.rememberPageContext
 import kotlinx.browser.document
 import kotlinx.browser.localStorage
+import kotlinx.browser.window
 import org.example.blogmultiplatform.models.ControlStyle
 import org.example.blogmultiplatform.navigation.Screen
 import org.jetbrains.compose.web.css.LineStyle
@@ -22,8 +23,8 @@ import kotlin.js.Date
 @Composable
 fun isUserLoggedIn(content: @Composable () -> Unit) {
     val context = rememberPageContext()
-    val remembered = remember { localStorage["remember"].toBoolean() }
-    val userId = remember { localStorage["userId"] }
+    val remembered = remember { window.localStorage.getItem("remember").toBoolean() }
+    val userId = remember { window.localStorage.getItem("userId") }
     var userIdExists by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = Unit) {
@@ -41,9 +42,9 @@ fun isUserLoggedIn(content: @Composable () -> Unit) {
 }
 
 fun logout() {
-    localStorage["remember"] = "false"
-    localStorage["userId"] = "false"
-    localStorage["username"] = "false"
+    window.localStorage.setItem("remember", "false")
+    window.localStorage.setItem("userId", "false")
+    window.localStorage.setItem("username", "false")
 }
 
 fun Modifier.noBorder(): Modifier {
